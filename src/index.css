@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .text-stroke {
+        -webkit-text-stroke: 2px black; /* épaisseur + couleur */
+    }
+    .text-stroke-white {
+        -webkit-text-stroke: 2px white;
+    }
+}
