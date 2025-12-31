@@ -14,7 +14,7 @@ function MaskedPhoto({ src }) {
     const borderColor = theme.white;
 
     return (
-        <div className="relative w-80 h-96">
+        <div className="relative w-96 full">
             {/* Effet de lumière bleue en arrière-plan - forme circulaire irrégulière */}
             <div
                 className="absolute -z-10 w-[140%] h-[130%] -top-[10%] -left-[15%] blur-[50px]"
@@ -97,9 +97,9 @@ function MaskedPhoto({ src }) {
 
                 <rect className="photo-rect" x="15" y="185" width="80" height="90" rx="8"
                       fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-                <rect className="photo-rect" x="120" y="140" width="100" height="90" rx="8"
+                <rect className="photo-rect" x="115" y="140" width="110" height="90" rx="8"
                       fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-                <rect className="photo-rect" x="120" y="245" width="170" height="85" rx="8"
+                <rect className="photo-rect" x="115" y="245" width="180" height="85" rx="8"
                       fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
                 <rect className="photo-rect" x="240" y="10" width="55" height="70" rx="8"
                       fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
