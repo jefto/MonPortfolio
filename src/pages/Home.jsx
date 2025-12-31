@@ -1,75 +1,72 @@
-import { MdOutlineLocalPhone } from "react-icons/md";
-import { MdOutlineFileDownload } from "react-icons/md";
-import { TfiEmail } from "react-icons/tfi";
-import background from "../assets/Rectangle.jpg";
+import { FaReact, FaJava, FaHtml5, FaCss3Alt, FaFigma, FaDatabase, FaCode } from "react-icons/fa";
+import { SiJavascript, SiTailwindcss, SiSpringboot } from "react-icons/si";
+import { BiCodeBlock, BiPalette } from "react-icons/bi";
+import { HiCode } from "react-icons/hi";
+import { BsBraces, BsCodeSlash } from "react-icons/bs";
+import HeroSection from "./sections/HeroSection";
+import About from "./sections/About";
+import Study from "./sections/Study";
+import Contact from "./sections/Contact";
+
+// Composant pour le background avec icônes
+function IconsBackground() {
+    const icons = [
+        { Icon: FaReact, x: 5, y: 10 },
+        { Icon: FaHtml5, x: 25, y: 5 },
+        { Icon: FaCss3Alt, x: 45, y: 15 },
+        { Icon: SiJavascript, x: 65, y: 8 },
+        { Icon: FaJava, x: 85, y: 12 },
+        { Icon: BsCodeSlash, x: 15, y: 30 },
+        { Icon: FaFigma, x: 35, y: 25 },
+        { Icon: SiTailwindcss, x: 55, y: 35 },
+        { Icon: FaDatabase, x: 75, y: 28 },
+        { Icon: BiCodeBlock, x: 95, y: 32 },
+        { Icon: HiCode, x: 10, y: 50 },
+        { Icon: BsBraces, x: 30, y: 55 },
+        { Icon: BiPalette, x: 50, y: 48 },
+        { Icon: FaCode, x: 70, y: 52 },
+        { Icon: SiSpringboot, x: 90, y: 45 },
+        { Icon: FaReact, x: 20, y: 70 },
+        { Icon: BsCodeSlash, x: 40, y: 75 },
+        { Icon: FaHtml5, x: 60, y: 68 },
+        { Icon: FaCss3Alt, x: 80, y: 72 },
+        { Icon: FaFigma, x: 8, y: 85 },
+        { Icon: SiJavascript, x: 28, y: 90 },
+        { Icon: BiCodeBlock, x: 48, y: 88 },
+        { Icon: FaDatabase, x: 68, y: 92 },
+        { Icon: HiCode, x: 88, y: 85 },
+    ];
+
+    return (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+            {icons.map((item, index) => (
+                <item.Icon
+                    key={index}
+                    className="absolute text-blue-400/20 text-5xl md:text-6xl"
+                    style={{ left: `${item.x}%`, top: `${item.y}%` }}
+                />
+            ))}
+        </div>
+    );
+}
+
 export default function Home() {
     return (
-        <div
-            className={`flex flex-col gap-4 text-white text-xl justify-center text-center pt-20`}
-        >
-            <h1
-                className={`font-bold text-6xl leading-tight text-center text-center`}
-            >
-                HELLO! I'M <em
-                    className={`font-bold text-6xl not-italic bg-gradient-to-r from-[#E5214D] to-[#FE9200] bg-clip-text text-transparent text-stroke`}
-                >
-                    TCHAMIE JEPHTE
-                </em>
-            </h1>
-            <p
-                className={`text-3xl leading-tight text-center`}
-            >
-                JE SUIS <em
-                            className={`not-italic text-[#E5214D]`}
-                        >
-                            DEVELOPEUR
-                        </em> WEB
-            </p>
-            <p
-                className={`text-3xl leading-tight text-center`}
-            > ET <em
-                    className={`not-italic text-[#E5214D]`}
-                 >UI | UX </em> DESIGNER</p>
-            <div
-                className={`flex flex-row justify-center pt-20 gap-40`}
-            >
-                <div
-                    className={`flex flex-row text-center justify-center gap-4 p-2`}
-                >
-                    <MdOutlineLocalPhone
-                        className={`h-10 w-10 bg-black rounded-full backdrop-blur-md p-2`}
-                    />
-                    <p
-                        className={`fond-bold text-black`}
-                    >
-                        +228 91020171
-                    </p>
-                </div>
-                <button
-                    className={`flex flex-row bg-black rounded-full p-2`}
-                >
-                    <MdOutlineFileDownload
-                        className={`h-10 w-10 bg-black rounded backdrop-blur-md `}
-                    />
-                    <p
-                        className={`p-2`}
-                    >
-                        Download CV
-                    </p>
-                </button>
-                <div
-                    className={`flex flex-row text-center justify-center gap-4 p-2`}
-                >
-                    <TfiEmail
-                        className={`h-10 w-10 bg-black rounded backdrop-blur-md p-2`}
-                    />
-                    <p
-                        className={`fond-bold text-black`}
-                    >
-                        jefftchamie@gmail.com
-                    </p>
-                </div>
-            </div>
+        <div className="min-h-screen relative">
+            {/* Background avec icônes */}
+            <IconsBackground />
+
+            {/* Section Hero */}
+            <HeroSection />
+
+            {/* Section À propos */}
+            <About />
+
+            {/* Section Parcours Académique */}
+            <Study />
+
+            {/* Section Contact / Footer */}
+            <Contact />
         </div>
     );
 }

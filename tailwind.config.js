@@ -5,7 +5,13 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'abril': ['"Abril Fatface"', 'serif'],
+        'allan': ['Allan', 'sans-serif'],
+        'poppins': ['Poppins', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 
