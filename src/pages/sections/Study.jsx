@@ -5,19 +5,19 @@ const parcoursData = [
         annee: "2023 - Actuellement",
         diplome: "Licence Professionnelle Génie Logiciel",
         etablissement: "École Polytechnique de Lomé",
-        description: "Formation en développement logiciel, architecture et gestion de projets"
+        description: "Formation en architecture et développement de logiciel"
     },
     {
         annee: "2020 - 2023",
         diplome: "Lycée",
         etablissement: "C.S. La Promotion",
-        description: "Mention Très Bien"
+        description: "Parcours Mathématique et Biologie. Mention Très Bien"
     },
     {
         annee: "2016 - 2020",
         diplome: "Collège",
         etablissement: "C.S. La Promotion",
-        description: "Mention Bien"
+        description: "Parcours Général. Mention Bien"
     }
 ];
 

@@ -4,11 +4,11 @@ import { FaXTwitter } from "react-icons/fa6";
 
 // Réseaux sociaux
 const socialLinks = [
-    { name: "GitHub", url: "https://github.com", icon: FaGithub },
-    { name: "LinkedIn", url: "https://linkedin.com", icon: FaLinkedin },
-    { name: "Instagram", url: "https://instagram.com", icon: FaInstagram },
+    { name: "GitHub", url: "https://github.com/jefto", icon: FaGithub },
+    { name: "LinkedIn", url: "https://www.linkedin.com/in/jefto2/", icon: FaLinkedin },
+    { name: "Instagram", url: "https://www.instagram.com/jefto2.0/", icon: FaInstagram },
     { name: "WhatsApp", url: "https://wa.me/22891020171", icon: FaWhatsapp },
-    { name: "Twitter/X", url: "https://twitter.com", icon: FaXTwitter }
+    { name: "Twitter/X", url: "https://x.com/putamadre2_0", icon: FaXTwitter }
 ];
 
 export default function Contact() {

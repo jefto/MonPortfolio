@@ -24,14 +24,11 @@ const skillsData = {
     ]
 };
 
-// Catégories de projets
+// Catégories de projets (remplacées par types : maquette / affiche)
 const projectCategories = [
     { id: "all", label: "Tous" },
-    { id: "web", label: "Web Design" },
-    { id: "mobile", label: "Mobile App" },
-    { id: "branding", label: "Branding" },
-    { id: "ui", label: "UI Design" },
-    { id: "illustration", label: "Illustration" }
+    { id: "maquette", label: "Maquettes" },
+    { id: "affiche", label: "Affiches" }
 ];
 
 // Projets design réalisés
@@ -42,10 +39,11 @@ const projectsData = [
         description: "Interface moderne pour une application de shopping avec une expérience utilisateur fluide et intuitive.",
         image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500",
         date: "2024-06",
-        dateDisplay: "2024",
+        dateDisplay: "06/2024",
         client: "Startup Fashion",
         link: "https://example.com",
-        category: "mobile"
+        category: "mobile",
+        type: "maquette"
     },
     {
         id: 2,
@@ -53,10 +51,11 @@ const projectsData = [
         description: "Design élégant et minimaliste pour un portfolio d'artiste avec animations subtiles.",
         image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=500",
         date: "2024-03",
-        dateDisplay: "2024",
+        dateDisplay: "03/2024",
         client: "Artiste Indépendant",
         link: "https://example.com",
-        category: "web"
+        category: "web",
+        type: "maquette"
     },
     {
         id: 3,
@@ -64,10 +63,11 @@ const projectsData = [
         description: "Création d'une identité de marque complète : logo, charte graphique, supports de communication.",
         image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500",
         date: "2023-11",
-        dateDisplay: "2023",
+        dateDisplay: "11/2023",
         client: "Entreprise Tech",
         link: "https://example.com",
-        category: "branding"
+        category: "branding",
+        type: "affiche"
     }
 ];
 
@@ -79,6 +79,13 @@ const socialLinks = [
     { name: "WhatsApp", url: "https://wa.me/22891020171", icon: FaWhatsapp },
     { name: "Twitter/X", url: "https://twitter.com", icon: FaXTwitter }
 ];
+
+// Commandes de navigation (déplacées au top-level pour être stables dans les hooks)
+const navigationCommands = {
+    back: ["Retour en arrière...", "Chargement..."],
+    home: ["Retour à l'accueil...", "Navigation..."],
+    dev: ["Vers la section Dev...", "Chargement du portfolio développement..."]
+};
 
 // Composant SkillCard artistique
 function SkillCard({ skill, level }) {
@@ -98,7 +105,7 @@ function SkillCard({ skill, level }) {
     );
 }
 
-// Composant ProjectCard artistique
+// Composant ProjectCard artistique (modifié pour supporter les deux types)
 function ProjectCard({ project, navigate }) {
     return (
         <div className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-pink-100 hover:border-pink-300">
@@ -119,15 +126,33 @@ function ProjectCard({ project, navigate }) {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2 font-abril">{project.name}</h3>
                 <p className="text-gray-600 text-sm mb-4 font-poppins line-clamp-3">{project.description}</p>
-                <button
-                    onClick={() => navigate(`/design/project/${project.id}`)}
-                    className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300"
-                >
-                    <span className="font-poppins">Voir le projet</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                </button>
+
+                {/* Boutons selon le type */}
+                {project.type === 'maquette' ? (
+                    // Maquettes : bouton externe pour visiter le prototype
+                    <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300"
+                    >
+                        <span className="font-poppins">Visiter le prototype</span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                ) : (
+                    // Affiches : navigation interne vers la page de détail
+                    <button
+                        onClick={() => navigate(`/design/project/${project.id}`)}
+                        className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300"
+                    >
+                        <span className="font-poppins">Voir le projet</span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -164,13 +189,6 @@ export default function DesignPart() {
         setFormData({ name: '', email: '', subject: '', message: '' });
     };
 
-    // Navigation commands
-    const navigationCommands = {
-        back: ["Retour en arrière...", "Chargement..."],
-        home: ["Retour à l'accueil...", "Navigation..."],
-        dev: ["Vers la section Dev...", "Chargement du portfolio développement..."]
-    };
-
     useEffect(() => {
         if (!isNavigating || !navigationData.type) return;
 
@@ -191,7 +209,7 @@ export default function DesignPart() {
             }, 500);
             return () => clearTimeout(timer);
         }
-    }, [isNavigating, currentLineIndex, navigationData, navigate]);
+    }, [isNavigating, currentLineIndex, navigationData, navigate, navigationCommands]);
 
     const handleNavigation = (type, destination) => {
         setNavigationData({ type, destination });
@@ -199,10 +217,10 @@ export default function DesignPart() {
         setIsNavigating(true);
     };
 
-    // Filtrer et trier les projets
+    // Filtrer et trier les projets (par type maintenant)
     const filteredProjects = projectsData
-        .filter(project => selectedCategory === "all" || project.category === selectedCategory)
-        .sort((a, b) => b.date.localeCompare(a.date));
+        .filter(project => selectedCategory === "all" || project.type === selectedCategory)
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
     const renderSkillCategory = (title, skills) => (
         <div className="mb-8">
@@ -561,3 +579,5 @@ export default function DesignPart() {
         </div>
     );
 }
+
+

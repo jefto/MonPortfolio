@@ -2,6 +2,7 @@ import { MdOutlineLocalPhone } from "react-icons/md";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { TfiEmail } from "react-icons/tfi";
 import profilePhoto from "../../assets/tof.jpg";
+import cvFile from "../../assets/CV_TCHAMIE_Jephte.pdf";
 
 // Couleurs du thème
 const theme = {
@@ -140,10 +141,10 @@ export default function HeroSection() {
                         <p className="font-bold w-20 text-gray-700 text-sm">91020171</p>
                     </div>
 
-                    <button className="flex flex-row w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30">
+                    <a href={cvFile} download="CV_TCHAMIE_Jephte.pdf" className="flex flex-row w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
                         <MdOutlineFileDownload className="h-8 w-8" />
                         <p className="p-2 font-semibold text-sm">Download CV</p>
-                    </button>
+                    </a>
 
                     <div className="flex flex-row items-center justify-center gap-3 ">
                         <TfiEmail className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600" />

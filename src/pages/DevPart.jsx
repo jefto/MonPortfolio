@@ -11,6 +11,14 @@ import {
     FormInput,
     AnimatedButton
 } from '../components/ui';
+import clubgi from '../assets/clubGi.png'
+import getseman from '../assets/getseman.png'
+import ijeaf from '../assets/ijeaf.png'
+import nocode from '../assets/nocode.png'
+import noel from '../assets/noel.png'
+import portfolio from '../assets/portfolio.png'
+import triki from '../assets/triki.png'
+import wemeet from '../assets/wemeet.png'
 
 // ============================================
 // DONNÉES - Modifier ici pour personnaliser
@@ -80,47 +88,131 @@ const skillsData = {
 const projectsData = [
     {
         id: 1,
-        name: "Projet E-commerce",
-        description: "Plateforme de vente en ligne complète avec système de paiement, gestion des stocks et tableau de bord administrateur.",
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=500",
-        date: "2024-06",
-        dateDisplay: "2024",
-        client: "Entreprise XYZ",
-        link: "https://example.com",
-        technologies: ["React", "Node.js", "PostgreSQL"],
+        name: "Site du Club Informatique - Ecole Polytechnique de Lomé",
+        description: "Conception d'un site web responsive présentant le club, ses sections et activités, avec un backend pour la gestion des contenus (membres, activités, événements).",
+        image: clubgi,
+        date: "2025-09-30",
+        dateDisplay: "09/2025",
+        client: "Présidence Club GI",
+        link: "https://club-gi-cyan.vercel.app",
+        technologies: ["React", "Tailwind CSS", "Spring Boot"],
         category: "fullstack"
     },
     {
         id: 2,
-        name: "Application de Gestion",
-        description: "Système de gestion interne pour le suivi des employés, des projets et des ressources de l'entreprise.",
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500",
-        date: "2024-03",
-        dateDisplay: "2024",
-        client: "Startup ABC",
-        link: "https://example.com",
-        technologies: ["Java", "Spring Boot", "MySQL"],
-        category: "backend"
+        name: "Plateforme de gestion événementielle (frontend)",
+        description: "Développement de la partie frontend d'une plateforme publiant des événements tech et permettant l'inscription des utilisateurs.",
+        image: wemeet,
+        date: "2025-09-18",
+        dateDisplay: "09/2025",
+        client: "Google Developer Group Lomé",
+        link: "https://wemeet-frontend.vercel.app/",
+        technologies: ["React", "Tailwind CSS"],
+        category: "frontend"
     },
     {
         id: 3,
-        name: "Site Vitrine",
-        description: "Site web moderne et responsive présentant les services et réalisations d'une agence créative.",
-        image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=500",
-        date: "2023-11",
-        dateDisplay: "2023",
-        client: "Agence Créative",
-        link: "https://example.com",
+        name: "Mon portfolio",
+        description: "Mon site personnel de présentation de réalisations et compétences.",
+        image: portfolio,
+        date: "2025-12-31",
+        dateDisplay: "12/2025",
+        client: "Moi-même",
+        link: "https://mon-portfolio-gamma-liart.vercel.app",
+        technologies: ["React", "Tailwind CSS"],
+        category: "frontend"
+    },
+    {
+        id: 4,
+        name: "Site Joyeux Noël (challenge)",
+        description: "Mini-site réalisé pour un défi LinkedIn pour souhaiter un joyeux Noël.",
+        image: noel,
+        date: "2024-12-25",
+        dateDisplay: "12/2024",
+        client: "Parfait TOKE",
+        link: "https://no-code-front-end-kpt9.vercel.app/",
+        technologies: ["HTML", "CSS"],
+        category: "frontend"
+    },
+    {
+        id: 5,
+        name: "Jeu de devinette (projet académique)",
+        description: "Jeu permettant de deviner un nombre, développé dans le cadre d'un projet tutoré.",
+        image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800",
+        date: "2025-02-02",
+        dateDisplay: "02/2025",
+        client: "Projet académique",
+        link: "https://github.com/jefto/devinette-c-origine",
+        technologies: ["C"],
+        category: "desktop"
+    },
+    {
+        id: 6,
+        name: "Site vitrine d'une église",
+        description: "Conception d'un site vitrine pour présenter les activités, la mission et les contacts de la paroisse.",
+        image: getseman,
+        date: "2025-02-07",
+        dateDisplay: "02/2025",
+        client: "Pasteur EKOUE Kangni",
+        link: "https://yesuleagbeavepozo.com/a_propos",
         technologies: ["HTML", "CSS", "JavaScript"],
         category: "frontend"
+    },
+    {
+        id: 7,
+        name: "Application de gestion - Salle de sport (Java Swing)",
+        description: "Application desktop pour gérer les abonnements, inscriptions aux séances, paiements et gestion des salles/équipements.",
+        image: "https://images.unsplash.com/photo-1518600506278-4e8ef466b810?w=800",
+        date: "2025-01-01",
+        dateDisplay: "01/2025",
+        client: "Projet académique",
+        link: "https://github.com/jefto/salle-sport-jpa.git",
+        technologies: ["Java Swing"],
+        category: "desktop"
+    },
+    {
+        id: 8,
+        name: "Site vitrine IJEAF",
+        description: "Site vitrine pour promouvoir une application mobile de marketplace.",
+        image: ijeaf,
+        date: "2025-09-29",
+        dateDisplay: "09/2025",
+        client: "IJEAF",
+        link: "https://ijeaf.africa",
+        technologies: ["React", "Tailwind CSS"],
+        category: "frontend"
+    },
+    {
+        id: 9,
+        name: "Plateforme d'analyse & prédiction consommation électrique",
+        description: "Intégration frontend et consommation d'API pour une plateforme d'analyse et prédiction de consommation électrique.",
+        image: triki,
+        date: "2025-12-10",
+        dateDisplay: "12/2025",
+        client: "M. Frederic",
+        link: "https://le-triki.vercel.app/dashboard",
+        technologies: ["React", "Tailwind CSS"],
+        category: "frontend"
+    },
+    {
+        id: 10,
+        name: "Plateforme no-code (stage)",
+        description: "Solution web permettant à des non-développeurs de créer des sites sans écrire de code.",
+        image: nocode,
+        date: "2025-03-01",
+        dateDisplay: "03/2025",
+        client: "Africa Ascent / SPARK Corporation",
+        link: "https://no-code-front-end.vercel.app/",
+        technologies: ["React", "Tailwind CSS", "Django"],
+        category: "fullstack"
     }
 ];
 
 // Statistiques
 const statsData = [
-    { label: "Projets complétés", value: "10+" },
-    { label: "Années d'expérience", value: "2+" },
-    { label: "Technologies maîtrisées", value: "15+" },
+    { label: "Projets complétés", value: "8+" },
+    { label: "Années d'expérience", value: "1+" },
+    { label: "Technologies maîtrisées", value: "10+" },
     { label: "Cafés consommés", value: "∞" }
 ];
 
