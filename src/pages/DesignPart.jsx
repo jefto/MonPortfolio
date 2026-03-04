@@ -239,7 +239,7 @@ export default function DesignPart() {
             }, 500);
             return () => clearTimeout(timer);
         }
-    }, [isNavigating, currentLineIndex, navigationData, navigate, navigationCommands]);
+    }, [isNavigating, currentLineIndex, navigationData, navigate]);
 
     const handleNavigation = (type, destination) => {
         setNavigationData({ type, destination });
