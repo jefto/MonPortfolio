@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import emailjs from "@emailjs/browser";
 import {
     MatrixRain,
     TerminalText,
@@ -236,7 +237,7 @@ const socialLinks = [
 const formFields = [
     { label: "Nom complet", name: "name", type: "text", placeholder: "John Doe", required: true },
     { label: "Email", name: "email", type: "email", placeholder: "john@example.com", required: true },
-    { label: "Sujet", name: "subject", type: "text", placeholder: "Projet de collaboration...", required: false },
+    { label: "Sujet", name: "title", type: "text", placeholder: "Projet de collaboration...", required: false },
     { label: "Message", name: "message", type: "textarea", placeholder: "Décrivez votre projet ou votre demande...", rows: 5, required: true }
 ];
 
@@ -251,6 +252,41 @@ export default function DevPart() {
     const [isNavigating, setIsNavigating] = useState(false);
     const [navigationData, setNavigationData] = useState({ type: '', destination: '' });
     const [currentLineIndex, setCurrentLineIndex] = useState(0);
+    const formRef = useRef();
+    const [buttonState, setButtonState] = useState('idle');
+
+    const handleContactSubmit = (e) => {
+        e.preventDefault();
+        setButtonState('sending');
+
+        emailjs
+            .sendForm(
+                'service_wey3t6a',
+                'template_po86ns4',
+                formRef.current,
+                'JoxxtCta16gAIhrX7'
+            )
+            .then(
+                (result) => {
+                    console.log('Email envoyé avec succès :', result.text);
+                    setButtonState('sent');
+                    formRef.current.reset();
+                    setTimeout(() => setButtonState('idle'), 3000);
+                },
+                (error) => {
+                    console.error('Erreur lors de l\'envoi de l\'email :', error.text);
+                    setButtonState('error');
+                    setTimeout(() => setButtonState('idle'), 3000);
+                }
+            );
+    };
+
+    const buttonConfig = {
+        idle: { text: 'Envoyer le message', disabled: false },
+        sending: { text: 'Envoi en cours...', disabled: true },
+        sent: { text: '✓ Message envoyé !', disabled: true },
+        error: { text: '✗ Échec de l\'envoi', disabled: true },
+    };
 
     useEffect(() => {
         setIsLoaded(true);
@@ -425,12 +461,17 @@ export default function DevPart() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Formulaire */}
                         <TerminalWindow title="send_message.sh">
-                            <form onSubmit={(e) => { e.preventDefault(); alert('Message envoyé !'); }}>
+                            <form ref={formRef} onSubmit={handleContactSubmit}>
                                 {formFields.map((field, index) => (
                                     <FormInput key={index} {...field} />
                                 ))}
                                 <div className="mt-6">
-                                    <AnimatedButton type="submit" text="Envoyer le message" showIcon={false} />
+                                    <AnimatedButton
+                                        type="submit"
+                                        text={buttonConfig[buttonState].text}
+                                        disabled={buttonConfig[buttonState].disabled}
+                                        showIcon={false}
+                                    />
                                 </div>
                             </form>
                         </TerminalWindow>

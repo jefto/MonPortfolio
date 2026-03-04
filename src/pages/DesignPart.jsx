@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import emailjs from "@emailjs/browser";
 import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
@@ -168,9 +169,11 @@ export default function DesignPart() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        subject: '',
+        title: '',
         message: ''
     });
+    const formRef = useRef();
+    const [buttonState, setButtonState] = useState('idle');
 
     useEffect(() => {
         setIsLoaded(true);
@@ -185,8 +188,35 @@ export default function DesignPart() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert('Message envoyé ! (À connecter avec un backend)');
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        setButtonState('sending');
+
+        emailjs
+            .sendForm(
+                'service_wey3t6a',
+                'template_po86ns4',
+                formRef.current,
+                'JoxxtCta16gAIhrX7'
+            )
+            .then(
+                (result) => {
+                    console.log('Email envoyé avec succès :', result.text);
+                    setButtonState('sent');
+                    setFormData({ name: '', email: '', title: '', message: '' });
+                    setTimeout(() => setButtonState('idle'), 3000);
+                },
+                (error) => {
+                    console.error('Erreur lors de l\'envoi de l\'email :', error.text);
+                    setButtonState('error');
+                    setTimeout(() => setButtonState('idle'), 3000);
+                }
+            );
+    };
+
+    const buttonConfig = {
+        idle: { text: 'Envoyer le message', className: 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600', disabled: false },
+        sending: { text: 'Envoi en cours...', className: 'bg-gradient-to-r from-pink-400 to-purple-400 cursor-wait', disabled: true },
+        sent: { text: '✓ Message envoyé !', className: 'bg-green-500', disabled: true },
+        error: { text: '✗ Échec de l\'envoi', className: 'bg-red-500', disabled: true },
     };
 
     useEffect(() => {
@@ -397,7 +427,7 @@ export default function DesignPart() {
                             {/* Formulaire de contact */}
                             <div className="font-poppins">
                                 <h3 className="text-2xl font-semibold mb-6 text-gray-800">Envoyez un message</h3>
-                                <form onSubmit={handleSubmit} className="space-y-4">
+                                <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
                                     {/* Nom */}
                                     <div>
                                         <label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-700">
@@ -434,14 +464,14 @@ export default function DesignPart() {
 
                                     {/* Sujet */}
                                     <div>
-                                        <label htmlFor="subject" className="block text-sm font-medium mb-2 text-gray-700">
+                                        <label htmlFor="title" className="block text-sm font-medium mb-2 text-gray-700">
                                             Sujet
                                         </label>
                                         <input
                                             type="text"
-                                            id="subject"
-                                            name="subject"
-                                            value={formData.subject}
+                                            id="title"
+                                            name="title"
+                                            value={formData.title}
                                             onChange={handleChange}
                                             className="w-full px-4 py-3 bg-white border-2 border-pink-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all"
                                             placeholder="Projet de collaboration..."
@@ -468,9 +498,10 @@ export default function DesignPart() {
                                     {/* Bouton Submit */}
                                     <button
                                         type="submit"
-                                        className="w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-pink-500/30"
+                                        disabled={buttonConfig[buttonState].disabled}
+                                        className={`w-full px-6 py-3 ${buttonConfig[buttonState].className} text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-pink-500/30`}
                                     >
-                                        Envoyer le message
+                                        {buttonConfig[buttonState].text}
                                     </button>
                                 </form>
                             </div>

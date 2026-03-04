@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import emailjs from "@emailjs/browser";
 import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
@@ -12,12 +13,14 @@ const socialLinks = [
 ];
 
 export default function Contact() {
+    const formRef = useRef();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        subject: '',
+        title: '',
         message: ''
     });
+    const [buttonState, setButtonState] = useState('idle'); // 'idle' | 'sending' | 'sent' | 'error'
 
     const handleChange = (e) => {
         setFormData({
@@ -28,8 +31,35 @@ export default function Contact() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert('Message envoyé ! (À connecter avec un backend)');
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        setButtonState('sending');
+
+        emailjs
+            .sendForm(
+                'service_wey3t6a',
+                'template_po86ns4',
+                formRef.current,
+                'JoxxtCta16gAIhrX7'
+            )
+            .then(
+                (result) => {
+                    console.log('Email envoyé avec succès :', result.text);
+                    setButtonState('sent');
+                    setFormData({ name: '', email: '', title: '', message: '' });
+                    setTimeout(() => setButtonState('idle'), 3000);
+                },
+                (error) => {
+                    console.error('Erreur lors de l\'envoi de l\'email :', error.text);
+                    setButtonState('error');
+                    setTimeout(() => setButtonState('idle'), 3000);
+                }
+            );
+    };
+
+    const buttonConfig = {
+        idle: { text: 'Envoyer le message', className: 'bg-blue-500 hover:bg-blue-600', disabled: false },
+        sending: { text: 'Envoi en cours...', className: 'bg-blue-400 cursor-wait', disabled: true },
+        sent: { text: '✓ Message envoyé !', className: 'bg-green-500', disabled: true },
+        error: { text: '✗ Échec de l\'envoi', className: 'bg-red-500', disabled: true },
     };
 
     return (
@@ -44,7 +74,7 @@ export default function Contact() {
                     {/* Formulaire de contact */}
                     <div className="font-poppins">
                         <h3 className="text-2xl font-semibold mb-6 text-blue-400">Envoyez un message</h3>
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
                             {/* Nom */}
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium mb-2">
@@ -81,14 +111,14 @@ export default function Contact() {
 
                             {/* Sujet */}
                             <div>
-                                <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                                <label htmlFor="title" className="block text-sm font-medium mb-2">
                                     Sujet
                                 </label>
                                 <input
                                     type="text"
-                                    id="subject"
-                                    name="subject"
-                                    value={formData.subject}
+                                    id="title"
+                                    name="title"
+                                    value={formData.title}
                                     onChange={handleChange}
                                     className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                                     placeholder="Projet de collaboration..."
@@ -115,9 +145,10 @@ export default function Contact() {
                             {/* Bouton Submit */}
                             <button
                                 type="submit"
-                                className="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-blue-500/30"
+                                disabled={buttonConfig[buttonState].disabled}
+                                className={`w-full px-6 py-3 ${buttonConfig[buttonState].className} text-white font-semibold rounded-lg transition-all duration-300 shadow-lg shadow-blue-500/30`}
                             >
-                                Envoyer le message
+                                {buttonConfig[buttonState].text}
                             </button>
                         </form>
                     </div>
