@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaTimes, FaImage, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaTimes, FaImage, FaExternalLinkAlt, FaCode } from 'react-icons/fa';
 import { getProjects, createProject, updateProject, deleteProject, getImageUrl } from '../../services/api';
 
 const CATEGORY_OPTIONS = [
@@ -457,4 +457,5 @@ export default function ProjectManager() {
         </div>
     );
 }
+
 

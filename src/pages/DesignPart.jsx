@@ -3,27 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import emailjs from "@emailjs/browser";
 import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { getProjects, mapToDesignProject, getSkills, groupDesignSkills } from '../services/api';
 
-// Données des logiciels maîtrisés
-const skillsData = {
-    design: [
-        { skill: "Figma", level: 85 },
-        { skill: "Adobe Express", level: 69 },
-        { skill: "Canva", level: 95 },
-        { skill: "Adobe XD", level: 75 },
-        { skill: "Sketch", level: 70 }
-    ],
-    prototyping: [
-        { skill: "Framer", level: 10 },
-        { skill: "Visily", level: 80 },
-        //{ skill: "InVision", level: 60 },
-        //{ skill: "Principle", level: 55 }
-    ],
-    other: [
-        //{ skill: "After Effects", level: 50 },
-        { skill: "Blender", level: 1 }
-    ]
-};
+// Les compétences design sont maintenant chargées depuis l'API backend
 
 // Catégories de projets (remplacées par types : maquette / affiche)
 const projectCategories = [
@@ -32,45 +14,7 @@ const projectCategories = [
     { id: "affiche", label: "Affiches" }
 ];
 
-// Projets design réalisés
-const projectsData = [
-    {
-        id: 1,
-        name: "App Mobile E-commerce",
-        description: "Interface moderne pour une application de shopping avec une expérience utilisateur fluide et intuitive.",
-        image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500",
-        date: "2024-06",
-        dateDisplay: "06/2024",
-        client: "Startup Fashion",
-        link: "https://example.com",
-        category: "mobile",
-        type: "maquette"
-    },
-    {
-        id: 2,
-        name: "Site Web Portfolio",
-        description: "Design élégant et minimaliste pour un portfolio d'artiste avec animations subtiles.",
-        image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=500",
-        date: "2024-03",
-        dateDisplay: "03/2024",
-        client: "Artiste Indépendant",
-        link: "https://example.com",
-        category: "web",
-        type: "maquette"
-    },
-    {
-        id: 3,
-        name: "Identité Visuelle",
-        description: "Création d'une identité de marque complète : logo, charte graphique, supports de communication.",
-        image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500",
-        date: "2023-11",
-        dateDisplay: "11/2023",
-        client: "Entreprise Tech",
-        link: "https://example.com",
-        category: "branding",
-        type: "affiche"
-    }
-];
+// Les projets design sont maintenant chargés depuis l'API backend
 
 // Réseaux sociaux
 const socialLinks = [
@@ -174,6 +118,49 @@ export default function DesignPart() {
     });
     const formRef = useRef();
     const [buttonState, setButtonState] = useState('idle');
+
+    // État pour les projets chargés depuis l'API
+    const [projectsData, setProjectsData] = useState([]);
+    const [projectsLoading, setProjectsLoading] = useState(true);
+    const [projectsError, setProjectsError] = useState(null);
+
+    // État pour les compétences chargées depuis l'API
+    const [skillsData, setSkillsData] = useState({ design: [], prototyping: [], other: [] });
+    const [skillsLoading, setSkillsLoading] = useState(true);
+
+    // Charger les projets design depuis l'API
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                setProjectsLoading(true);
+                setProjectsError(null);
+                const projects = await getProjects({ category: "projet-design" });
+                setProjectsData(projects.map(mapToDesignProject));
+            } catch (err) {
+                console.error("Erreur chargement projets design:", err);
+                setProjectsError(err.message);
+            } finally {
+                setProjectsLoading(false);
+            }
+        };
+        fetchProjects();
+    }, []);
+
+    // Charger les compétences design depuis l'API
+    useEffect(() => {
+        const fetchSkills = async () => {
+            try {
+                setSkillsLoading(true);
+                const skills = await getSkills({ category: "design" });
+                setSkillsData(groupDesignSkills(skills));
+            } catch (err) {
+                console.error("Erreur chargement compétences design:", err);
+            } finally {
+                setSkillsLoading(false);
+            }
+        };
+        fetchSkills();
+    }, []);
 
     useEffect(() => {
         setIsLoaded(true);
@@ -373,9 +360,22 @@ export default function DesignPart() {
                     <h2 className="text-3xl font-bold text-gray-800 mb-6 font-abril">
                         <span className="text-pink-500">✦</span> Logiciels maîtrisés
                     </h2>
-                    {renderSkillCategory("Design", skillsData.design)}
-                    {renderSkillCategory("Prototypage", skillsData.prototyping)}
-                    {renderSkillCategory("Autres", skillsData.other)}
+                    {skillsLoading ? (
+                        <div className="text-center py-8">
+                            <div className="animate-spin w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full mx-auto mb-3" />
+                            <p className="text-gray-500 font-poppins">Chargement des compétences...</p>
+                        </div>
+                    ) : (
+                        <>
+                            {skillsData.design.length > 0 && renderSkillCategory("Design", skillsData.design)}
+                            {skillsData.prototyping.length > 0 && renderSkillCategory("Prototypage", skillsData.prototyping)}
+                            {skillsData.other.length > 0 && renderSkillCategory("Autres", skillsData.other)}
+                            {skillsData.design.length === 0 && skillsData.prototyping.length === 0 &&
+                             skillsData.other.length === 0 && (
+                                <p className="text-gray-400 text-center py-4 font-poppins">Aucune compétence enregistrée</p>
+                            )}
+                        </>
+                    )}
                 </section>
 
                 {/* Section Projets */}
@@ -403,7 +403,17 @@ export default function DesignPart() {
 
                     {/* Grille des projets */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredProjects.length > 0 ? (
+                        {projectsLoading ? (
+                            <div className="col-span-full text-center py-12">
+                                <div className="animate-spin w-10 h-10 border-4 border-pink-500 border-t-transparent rounded-full mx-auto mb-4" />
+                                <p className="text-gray-500 text-lg font-poppins">Chargement des projets...</p>
+                            </div>
+                        ) : projectsError ? (
+                            <div className="col-span-full text-center py-12">
+                                <p className="text-red-500 text-lg font-poppins">Erreur : {projectsError}</p>
+                                <p className="text-gray-400 text-sm mt-2 font-poppins">Vérifiez que le backend est lancé sur {process.env.REACT_APP_API_URL || 'http://localhost:3000'}</p>
+                            </div>
+                        ) : filteredProjects.length > 0 ? (
                             filteredProjects.map((project) => (
                                 <ProjectCard key={project.id} project={project} navigate={navigate} />
                             ))

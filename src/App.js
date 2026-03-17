@@ -6,6 +6,8 @@ import Study from "./pages/sections/Study";
 import DevPart from "./pages/DevPart";
 import DesignPart from "./pages/DesignPart";
 import DetailDesignProject from "./pages/DetailDesignProject";
+import DetailDevProject from "./pages/DetailDevProject";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 export default function App() {
     return (
@@ -17,8 +19,10 @@ export default function App() {
                     <Route path="/skill" element={<Study />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/dev" element={<DevPart />} />
+                    <Route path="/dev/project/:id" element={<DetailDevProject />} />
                     <Route path="/design" element={<DesignPart />} />
                     <Route path="/design/project/:id" element={<DetailDesignProject />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
                 </Routes>
             </div>
         </BrowserRouter>

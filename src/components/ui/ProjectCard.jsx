@@ -34,7 +34,7 @@ export default function ProjectCard({ project }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute top-3 right-3 bg-green-500/20 border border-green-500/50
                                 px-2 py-1 rounded text-xs text-green-400 font-mono">
-                    {project.date}
+                    {project.dateDisplay || project.date}
                 </div>
             </div>
 
@@ -71,8 +71,11 @@ export default function ProjectCard({ project }) {
                     </span>
                 </div>
 
-                {/* Bouton Visiter avec effet étoile filante */}
-                <AnimatedButton href={project.link} text="Visiter" />
+                {/* Boutons : Visiter + Voir détails */}
+                <div className="flex flex-wrap gap-2">
+                    <AnimatedButton href={project.link} text="Visiter" />
+                    <AnimatedButton href={`/dev/project/${project.id}`} text="Détails" showIcon={false} />
+                </div>
             </div>
         </motion.div>
     );

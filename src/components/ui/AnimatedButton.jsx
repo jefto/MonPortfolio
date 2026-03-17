@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 /**
  * Bouton avec effet étoile filante sur les bordures au hover - Style Matrix
@@ -131,6 +132,19 @@ export default function AnimatedButton({
         onMouseEnter: () => setIsHovered(true),
         onMouseLeave: () => setIsHovered(false)
     };
+
+    // Si c'est un lien interne (commence par /)
+    if (href && href.startsWith('/')) {
+        return (
+            <Link
+                to={href}
+                className={baseClasses}
+                {...hoverHandlers}
+            >
+                <ButtonContent />
+            </Link>
+        );
+    }
 
     // Si c'est un lien externe
     if (href) {

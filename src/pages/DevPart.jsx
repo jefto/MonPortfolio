@@ -12,14 +12,7 @@ import {
     FormInput,
     AnimatedButton
 } from '../components/ui';
-import clubgi from '../assets/clubGi.png'
-import getseman from '../assets/getseman.png'
-import ijeaf from '../assets/ijeaf.png'
-import nocode from '../assets/nocode.png'
-import noel from '../assets/noel.png'
-import portfolio from '../assets/portfolio.png'
-import triki from '../assets/triki.png'
-import wemeet from '../assets/wemeet.png'
+import { getProjects, mapToDevProject, getSkills, groupDevSkills } from '../services/api';
 
 // ============================================
 // DONNÉES - Modifier ici pour personnaliser
@@ -57,157 +50,9 @@ const projectCategories = [
     { id: "desktop", label: "Desktop" }
 ];
 
-// Compétences par catégorie
-const skillsData = {
-    langages: [
-        { skill: "HTML", level: 95 },
-        { skill: "CSS", level: 90 },
-        { skill: "JavaScript", level: 68 },
-        { skill: "Java", level: 50 },
-        { skill: "Python", level: 20 }
-    ],
-    frameworks: [
-        { skill: "Tailwind CSS", level: 90 },
-        { skill: "React.js", level: 55 },
-        { skill: "Spring Boot", level: 45 },
-        { skill: "Java Swing", level: 43 },
-        { skill: "Flask", level: 5 }
-    ],
-    databases: [
-        { skill: "PostgreSQL", level: 88 },
-        { skill: "MySQL", level: 75 },
-        { skill: "Oracle", level: 59 },
-        { skill: "MariaDB", level: 35 }
-    ],
-    outils: [
-        { skill: "Draw.io", level: 95 },
-        { skill: "Postman", level: 73 }
-    ]
-};
+// Les compétences sont maintenant chargées depuis l'API backend
 
-// Projets réalisés (avec catégorie et date complète pour le tri)
-const projectsData = [
-    {
-        id: 1,
-        name: "Site du Club Informatique - Ecole Polytechnique de Lomé",
-        description: "Conception d'un site web responsive présentant le club, ses sections et activités, avec un backend pour la gestion des contenus (membres, activités, événements).",
-        image: clubgi,
-        date: "2025-09-30",
-        dateDisplay: "09/2025",
-        client: "Présidence Club GI",
-        link: "https://club-gi-cyan.vercel.app",
-        technologies: ["React", "Tailwind CSS", "Spring Boot"],
-        category: "fullstack"
-    },
-    {
-        id: 2,
-        name: "Plateforme de gestion événementielle (frontend)",
-        description: "Développement de la partie frontend d'une plateforme publiant des événements tech et permettant l'inscription des utilisateurs.",
-        image: wemeet,
-        date: "2025-09-18",
-        dateDisplay: "09/2025",
-        client: "Google Developer Group Lomé",
-        link: "https://wemeet-frontend.vercel.app/",
-        technologies: ["React", "Tailwind CSS"],
-        category: "frontend"
-    },
-    {
-        id: 3,
-        name: "Mon portfolio",
-        description: "Mon site personnel de présentation de réalisations et compétences.",
-        image: portfolio,
-        date: "2025-12-31",
-        dateDisplay: "12/2025",
-        client: "Moi-même",
-        link: "https://mon-portfolio-gamma-liart.vercel.app",
-        technologies: ["React", "Tailwind CSS"],
-        category: "frontend"
-    },
-    {
-        id: 4,
-        name: "Site Joyeux Noël (challenge)",
-        description: "Mini-site réalisé pour un défi LinkedIn pour souhaiter un joyeux Noël.",
-        image: noel,
-        date: "2024-12-25",
-        dateDisplay: "12/2024",
-        client: "Parfait TOKE",
-        link: "https://no-code-front-end-kpt9.vercel.app/",
-        technologies: ["HTML", "CSS"],
-        category: "frontend"
-    },
-    {
-        id: 5,
-        name: "Jeu de devinette (projet académique)",
-        description: "Jeu permettant de deviner un nombre, développé dans le cadre d'un projet tutoré.",
-        image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800",
-        date: "2025-02-02",
-        dateDisplay: "02/2025",
-        client: "Projet académique",
-        link: "https://github.com/jefto/devinette-c-origine",
-        technologies: ["C"],
-        category: "desktop"
-    },
-    {
-        id: 6,
-        name: "Site vitrine d'une église",
-        description: "Conception d'un site vitrine pour présenter les activités, la mission et les contacts de la paroisse.",
-        image: getseman,
-        date: "2025-02-07",
-        dateDisplay: "02/2025",
-        client: "Pasteur EKOUE Kangni",
-        link: "https://yesuleagbeavepozo.com/a_propos",
-        technologies: ["HTML", "CSS", "JavaScript"],
-        category: "frontend"
-    },
-    {
-        id: 7,
-        name: "Application de gestion - Salle de sport (Java Swing)",
-        description: "Application desktop pour gérer les abonnements, inscriptions aux séances, paiements et gestion des salles/équipements.",
-        image: "https://images.unsplash.com/photo-1518600506278-4e8ef466b810?w=800",
-        date: "2025-01-01",
-        dateDisplay: "01/2025",
-        client: "Projet académique",
-        link: "https://github.com/jefto/salle-sport-jpa.git",
-        technologies: ["Java Swing"],
-        category: "desktop"
-    },
-    {
-        id: 8,
-        name: "Site vitrine IJEAF",
-        description: "Site vitrine pour promouvoir une application mobile de marketplace.",
-        image: ijeaf,
-        date: "2025-09-29",
-        dateDisplay: "09/2025",
-        client: "IJEAF",
-        link: "https://ijeaf.africa",
-        technologies: ["React", "Tailwind CSS"],
-        category: "frontend"
-    },
-    {
-        id: 9,
-        name: "Plateforme d'analyse & prédiction consommation électrique",
-        description: "Intégration frontend et consommation d'API pour une plateforme d'analyse et prédiction de consommation électrique.",
-        image: triki,
-        date: "2025-12-10",
-        dateDisplay: "12/2025",
-        client: "M. Frederic",
-        link: "https://le-triki.vercel.app/dashboard",
-        technologies: ["React", "Tailwind CSS"],
-        category: "frontend"
-    },
-    {
-        id: 10,
-        name: "Plateforme no-code (stage)",
-        description: "Solution web permettant à des non-développeurs de créer des sites sans écrire de code.",
-        image: nocode,
-        date: "2025-03-01",
-        dateDisplay: "03/2025",
-        client: "Africa Ascent / SPARK Corporation",
-        link: "https://no-code-front-end.vercel.app/",
-        technologies: ["React", "Tailwind CSS", "Django"],
-        category: "fullstack"
-    }
-];
+// Les projets sont maintenant chargés depuis l'API backend
 
 // Statistiques
 const statsData = [
@@ -254,6 +99,49 @@ export default function DevPart() {
     const [currentLineIndex, setCurrentLineIndex] = useState(0);
     const formRef = useRef();
     const [buttonState, setButtonState] = useState('idle');
+
+    // État pour les projets chargés depuis l'API
+    const [projectsData, setProjectsData] = useState([]);
+    const [projectsLoading, setProjectsLoading] = useState(true);
+    const [projectsError, setProjectsError] = useState(null);
+
+    // État pour les compétences chargées depuis l'API
+    const [skillsData, setSkillsData] = useState({ langages: [], frameworks: [], databases: [], outils: [] });
+    const [skillsLoading, setSkillsLoading] = useState(true);
+
+    // Charger les projets dev depuis l'API
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                setProjectsLoading(true);
+                setProjectsError(null);
+                const projects = await getProjects({ category: "projet-dev" });
+                setProjectsData(projects.map(mapToDevProject));
+            } catch (err) {
+                console.error("Erreur chargement projets dev:", err);
+                setProjectsError(err.message);
+            } finally {
+                setProjectsLoading(false);
+            }
+        };
+        fetchProjects();
+    }, []);
+
+    // Charger les compétences dev depuis l'API
+    useEffect(() => {
+        const fetchSkills = async () => {
+            try {
+                setSkillsLoading(true);
+                const skills = await getSkills({ category: "dev" });
+                setSkillsData(groupDevSkills(skills));
+            } catch (err) {
+                console.error("Erreur chargement compétences dev:", err);
+            } finally {
+                setSkillsLoading(false);
+            }
+        };
+        fetchSkills();
+    }, []);
 
     const handleContactSubmit = (e) => {
         e.preventDefault();
@@ -399,10 +287,23 @@ export default function DevPart() {
                 {/* Section Compétences */}
                 <section className={`mb-16 transition-all duration-1000 delay-500 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
                     <SectionTitle command="cat skills.json" />
-                    {renderSkillCategory("Langages", skillsData.langages)}
-                    {renderSkillCategory("Frameworks", skillsData.frameworks)}
-                    {renderSkillCategory("Bases de données", skillsData.databases)}
-                    {renderSkillCategory("Outils", skillsData.outils)}
+                    {skillsLoading ? (
+                        <div className="text-center py-8 text-green-500/60">
+                            <div className="animate-spin w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full mx-auto mb-3" />
+                            <p>{`> Chargement des compétences...`}</p>
+                        </div>
+                    ) : (
+                        <>
+                            {skillsData.langages.length > 0 && renderSkillCategory("Langages", skillsData.langages)}
+                            {skillsData.frameworks.length > 0 && renderSkillCategory("Frameworks", skillsData.frameworks)}
+                            {skillsData.databases.length > 0 && renderSkillCategory("Bases de données", skillsData.databases)}
+                            {skillsData.outils.length > 0 && renderSkillCategory("Outils", skillsData.outils)}
+                            {skillsData.langages.length === 0 && skillsData.frameworks.length === 0 &&
+                             skillsData.databases.length === 0 && skillsData.outils.length === 0 && (
+                                <p className="text-green-500/60 text-center py-4">{`> Aucune compétence enregistrée`}</p>
+                            )}
+                        </>
+                    )}
                 </section>
 
                 {/* Section Projets */}
@@ -428,7 +329,17 @@ export default function DevPart() {
 
                     {/* Grille des projets */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredProjects.length > 0 ? (
+                        {projectsLoading ? (
+                            <div className="col-span-full text-center py-12 text-green-500/60">
+                                <div className="animate-spin w-10 h-10 border-2 border-green-500 border-t-transparent rounded-full mx-auto mb-4" />
+                                <p className="text-lg">{`> Chargement des projets...`}</p>
+                            </div>
+                        ) : projectsError ? (
+                            <div className="col-span-full text-center py-12 text-red-400">
+                                <p className="text-lg">{`> Erreur: ${projectsError}`}</p>
+                                <p className="text-sm mt-2 text-green-500/60">{`> Vérifiez que le backend est lancé sur ${process.env.REACT_APP_API_URL || 'http://localhost:3000'}`}</p>
+                            </div>
+                        ) : filteredProjects.length > 0 ? (
                             filteredProjects.map((project) => (
                                 <ProjectCard key={project.id} project={project} />
                             ))

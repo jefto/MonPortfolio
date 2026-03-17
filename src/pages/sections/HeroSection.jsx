@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import { MdOutlineLocalPhone } from "react-icons/md";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { TfiEmail } from "react-icons/tfi";
 import profilePhoto from "../../assets/tof.jpg";
-import cvFile from "../../assets/CV_TCHAMIE_Jephte.pdf";
+import { getCV, getCVUrl } from "../../services/api";
 
 // Couleurs du thème
 const theme = {
@@ -114,6 +115,26 @@ function MaskedPhoto({ src }) {
 }
 
 export default function HeroSection() {
+    const [cvData, setCvData] = useState(null);
+    const [cvLoading, setCvLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCV = async () => {
+            try {
+                const cv = await getCV();
+                setCvData(cv);
+            } catch (err) {
+                console.error("Erreur chargement CV:", err);
+            } finally {
+                setCvLoading(false);
+            }
+        };
+        fetchCV();
+    }, []);
+
+    const cvUrl = cvData ? getCVUrl(cvData) : "";
+    const cvFileName = cvData?.originalName || "CV.pdf";
+
     return (
         <section className="flex flex-row lg:flex-row gap-8 text-xl justify-center items-center min-h-screen px-8 md:px-16 py-12 max-w-7xl mx-auto">
             {/* Section Texte */}
@@ -127,7 +148,7 @@ export default function HeroSection() {
 
                 <p className="text-2xl md:text-3xl leading-tight text-gray-700 font-poppins">
                     JE SUIS{' '}
-                    <em className="not-italic text-blue-600 font-semibold">DÉVELOPPEUR WEB</em>
+                    <em className="not-italic text-blue-600 font-semibold">INGENIEUR GENIE LOGICIEL</em>
                 </p>
                 <em className={`text-2xl md:text-3xl leading-tight text-gray-700 font-poppins`}>&</em>
                 <p className="text-2xl md:text-3xl leading-tight text-gray-700 font-allan">
@@ -141,10 +162,22 @@ export default function HeroSection() {
                         <p className="font-bold w-20 text-gray-700 text-sm">91020171</p>
                     </div>
 
-                    <a href={cvFile} download="CV_TCHAMIE_Jephte.pdf" className="flex flex-row w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
-                        <MdOutlineFileDownload className="h-8 w-8" />
-                        <p className="p-2 font-semibold text-sm">Download CV</p>
-                    </a>
+                    {cvLoading ? (
+                        <div className="flex flex-row w-44 h-12 items-center justify-center bg-blue-400 rounded-full py-2 text-white shadow-lg shadow-blue-500/30 cursor-wait opacity-70">
+                            <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2" />
+                            <p className="p-2 font-semibold text-sm">Chargement...</p>
+                        </div>
+                    ) : cvUrl ? (
+                        <a href={cvUrl} download={cvFileName} target="_blank" rel="noopener noreferrer" className="flex flex-row w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
+                            <MdOutlineFileDownload className="h-8 w-8" />
+                            <p className="p-2 font-semibold text-sm">Download CV</p>
+                        </a>
+                    ) : (
+                        <div className="flex flex-row w-44 h-12 items-center justify-center bg-gray-400 rounded-full py-2 text-white shadow-lg opacity-50 cursor-not-allowed">
+                            <MdOutlineFileDownload className="h-8 w-8" />
+                            <p className="p-2 font-semibold text-sm">CV indisponible</p>
+                        </div>
+                    )}
 
                     <div className="flex flex-row items-center justify-center gap-3 ">
                         <TfiEmail className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600" />
