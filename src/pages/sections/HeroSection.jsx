@@ -3,7 +3,7 @@ import { MdOutlineLocalPhone } from "react-icons/md";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { TfiEmail } from "react-icons/tfi";
 import profilePhoto from "../../assets/tof.jpg";
-import { getCV, getCVUrl } from "../../services/api";
+import { getCV, getCVDownloadUrl } from "../../services/api";
 
 // Couleurs du thème
 const theme = {
@@ -132,8 +132,9 @@ export default function HeroSection() {
         fetchCV();
     }, []);
 
-    const cvUrl = cvData ? getCVUrl(cvData) : null;
     const cvFileName = cvData?.originalName || "CV.pdf";
+    // URL du proxy backend → force Content-Disposition: attachment (téléchargement garanti)
+    const cvDownloadUrl = cvData ? getCVDownloadUrl() : null;
 
     return (
         <section className="flex flex-row lg:flex-row gap-8 text-xl justify-center items-center min-h-screen px-8 md:px-16 py-12 max-w-7xl mx-auto">
@@ -167,8 +168,8 @@ export default function HeroSection() {
                             <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2" />
                             <p className="p-2 font-semibold text-sm">Chargement...</p>
                         </div>
-                    ) : cvUrl ? (
-                        <a href={cvUrl} download={cvFileName} target="_blank" rel="noopener noreferrer" className="flex flex-row w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
+                    ) : cvDownloadUrl ? (
+                        <a href={cvDownloadUrl} download={cvFileName} className="flex flex-row w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
                             <MdOutlineFileDownload className="h-8 w-8" />
                             <p className="p-2 font-semibold text-sm">Download CV</p>
                         </a>

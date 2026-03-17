@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaUpload, FaTrash, FaFileAlt, FaDownload } from 'react-icons/fa';
-import { getCV, getCVUrl, uploadCV, deleteCV } from '../../services/api';
+import { getCV, getCVUrl, getCVDownloadUrl, uploadCV, deleteCV } from '../../services/api';
 
 export default function CVManager() {
     const [cv, setCv] = useState(null);
@@ -81,7 +81,9 @@ export default function CVManager() {
         setTimeout(() => setSuccessMsg(''), 3000);
     };
 
+    // URL preview (Cloudinary direct) et URL téléchargement (proxy backend)
     const cvUrl = cv ? getCVUrl(cv) : null;
+    const cvDownloadUrl = cv ? getCVDownloadUrl() : null;
 
     const formatDate = (isoStr) => {
         if (!isoStr) return '';
@@ -124,10 +126,8 @@ export default function CVManager() {
                             </div>
                             <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
                                 <a
-                                    href={cvUrl}
+                                    href={cvDownloadUrl}
                                     download={cv.originalName}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                     className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
                                 >
                                     <FaDownload className="text-xs" /> Télécharger le CV
