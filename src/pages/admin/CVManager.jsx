@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaUpload, FaTrash, FaFileAlt, FaDownload } from 'react-icons/fa';
-import { getCV, getCVUrl, getCVDownloadUrl, uploadCV, deleteCV } from '../../services/api';
+import { getCV, downloadCV, uploadCV, deleteCV } from '../../services/api';
 
 export default function CVManager() {
     const [cv, setCv] = useState(null);
@@ -81,9 +81,6 @@ export default function CVManager() {
         setTimeout(() => setSuccessMsg(''), 3000);
     };
 
-    // URL preview (Cloudinary direct) et URL téléchargement (proxy backend)
-    const cvUrl = cv ? getCVUrl(cv) : null;
-    const cvDownloadUrl = cv ? getCVDownloadUrl() : null;
 
     const formatDate = (isoStr) => {
         if (!isoStr) return '';
@@ -125,13 +122,12 @@ export default function CVManager() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
-                                <a
-                                    href={cvDownloadUrl}
-                                    download={cv.originalName}
+                                <button
+                                    onClick={downloadCV}
                                     className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
                                 >
                                     <FaDownload className="text-xs" /> Télécharger le CV
-                                </a>
+                                </button>
                                 <button onClick={handleDeleteCV} disabled={deleting}
                                     className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium disabled:opacity-50">
                                     <FaTrash className="text-xs" /> {deleting ? 'Suppression...' : 'Supprimer'}

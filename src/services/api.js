@@ -217,13 +217,13 @@ export const getCVUrl = (cv) => {
 };
 
 /**
- * Retourne l'URL du proxy de téléchargement du CV (backend).
- * Le backend récupère le PDF depuis Cloudinary et envoie
- * Content-Disposition: attachment → force le téléchargement dans tous les navigateurs,
- * contournant la restriction cross-origin de l'attribut HTML `download`.
- * @returns {string} URL du endpoint /api/cv/download
+ * Télécharge le CV en passant par le proxy backend.
+ * Le backend génère une URL signée Cloudinary et streame le PDF avec
+ * Content-Disposition: attachment → téléchargement garanti, sans 401.
  */
-export const getCVDownloadUrl = () => `${BASE_URL}/api/cv/download`;
+export const downloadCV = () => {
+    window.open(`${BASE_URL}/api/cv/download`, '_blank');
+};
 
 /**
  * Upload ou remplace le CV

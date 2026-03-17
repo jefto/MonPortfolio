@@ -3,7 +3,7 @@ import { MdOutlineLocalPhone } from "react-icons/md";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { TfiEmail } from "react-icons/tfi";
 import profilePhoto from "../../assets/tof.jpg";
-import { getCV, getCVDownloadUrl } from "../../services/api";
+import { getCV, downloadCV } from "../../services/api";
 
 // Couleurs du thème
 const theme = {
@@ -133,62 +133,60 @@ export default function HeroSection() {
     }, []);
 
     const cvFileName = cvData?.originalName || "CV.pdf";
-    // URL du proxy backend → force Content-Disposition: attachment (téléchargement garanti)
-    const cvDownloadUrl = cvData ? getCVDownloadUrl() : null;
 
     return (
-        <section className="flex flex-row lg:flex-row gap-8 text-xl justify-center items-center min-h-screen px-8 md:px-16 py-12 max-w-7xl mx-auto">
+        <section className="flex flex-col lg:flex-row gap-8 justify-center items-center min-h-screen px-4 sm:px-8 md:px-16 py-12 max-w-7xl mx-auto">
             {/* Section Texte */}
-            <div className="flex flex-col gap-4 text-center lg:text-left lg:flex-1 w-64">
-                <h1 className="text-5xl  leading-tight text-gray-800 font-poppins">
+            <div className="flex flex-col gap-4 text-center lg:text-left lg:flex-1 w-full max-w-lg lg:max-w-none">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight text-gray-800 font-poppins">
                     HELLO! I'M{' '}
                     <em className="font-bold not-italic text-blue-500 block mt-2 font-abril">
                         TCHAMIE JEPHTE
                     </em>
                 </h1>
 
-                <p className="text-2xl md:text-3xl leading-tight text-gray-700 font-poppins">
-                    JE SUIS{' '}
-                    <em className="not-italic text-blue-600 font-semibold">INGENIEUR GENIE LOGICIEL</em>
+                <p className="text-xl sm:text-2xl md:text-3xl leading-tight text-gray-700 font-poppins">
+                    INGENIEUR{' '}
+                    <em className="not-italic text-blue-600 font-semibold">GENIE LOGICIEL</em>
                 </p>
-                <em className={`text-2xl md:text-3xl leading-tight text-gray-700 font-poppins`}>&</em>
-                <p className="text-2xl md:text-3xl leading-tight text-gray-700 font-allan">
-                     <em className="not-italic text-blue-500 font-semibold">UI | UX</em> {' '}DESIGNER
+                <em className="text-xl sm:text-2xl md:text-3xl leading-tight text-gray-700 font-poppins">&</em>
+                <p className="text-xl sm:text-2xl md:text-3xl leading-tight text-gray-700 font-allan">
+                    <em className="not-italic text-blue-500 font-semibold">UI | UX</em>{' '}DESIGNER
                 </p>
 
                 {/* Boutons d'action */}
-                <div className="flex flex-col md:flex-row justify-center lg:justify-start pt-8 gap-4 md:gap-5 font-poppins">
-                    <div className="flex flex-row items-center justify-center gap-3 ">
-                        <MdOutlineLocalPhone className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600" />
-                        <p className="font-bold w-20 text-gray-700 text-sm">91020171</p>
+                <div className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start pt-6 gap-3 sm:gap-4 font-poppins">
+                    <div className="flex flex-row items-center justify-center gap-3">
+                        <MdOutlineLocalPhone className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600 flex-shrink-0" />
+                        <p className="font-bold text-gray-700 text-sm">91020171</p>
                     </div>
 
                     {cvLoading ? (
-                        <div className="flex flex-row w-44 h-12 items-center justify-center bg-blue-400 rounded-full py-2 text-white shadow-lg shadow-blue-500/30 cursor-wait opacity-70">
+                        <div className="flex flex-row w-full sm:w-44 h-12 items-center justify-center bg-blue-400 rounded-full py-2 text-white shadow-lg shadow-blue-500/30 cursor-wait opacity-70">
                             <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2" />
                             <p className="p-2 font-semibold text-sm">Chargement...</p>
                         </div>
-                    ) : cvDownloadUrl ? (
-                        <a href={cvDownloadUrl} download={cvFileName} className="flex flex-row w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
+                    ) : cvData ? (
+                        <button onClick={downloadCV} className="flex flex-row w-full sm:w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
                             <MdOutlineFileDownload className="h-8 w-8" />
                             <p className="p-2 font-semibold text-sm">Download CV</p>
-                        </a>
+                        </button>
                     ) : (
-                        <div className="flex flex-row w-44 h-12 items-center justify-center bg-gray-400 rounded-full py-2 text-white shadow-lg opacity-50 cursor-not-allowed">
+                        <div className="flex flex-row w-full sm:w-44 h-12 items-center justify-center bg-gray-400 rounded-full py-2 text-white shadow-lg opacity-50 cursor-not-allowed">
                             <MdOutlineFileDownload className="h-8 w-8" />
                             <p className="p-2 font-semibold text-sm">CV indisponible</p>
                         </div>
                     )}
 
-                    <div className="flex flex-row items-center justify-center gap-3 ">
-                        <TfiEmail className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600" />
-                        <p className="font-bold w-20 text-gray-700 text-sm ">jefftchamie@gmail.com</p>
+                    <div className="flex flex-row items-center justify-center gap-3">
+                        <TfiEmail className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600 flex-shrink-0" />
+                        <p className="font-bold text-gray-700 text-sm break-all">jefftchamie@gmail.com</p>
                     </div>
                 </div>
             </div>
 
-            {/* Section Photo */}
-            <div className="w-1/3 lg:flex-1 flex justify-center items-center">
+            {/* Section Photo — cachée sur très petit écran, réduite sur mobile */}
+            <div className="hidden sm:flex lg:flex-1 justify-center items-center w-full max-w-xs sm:max-w-sm lg:max-w-none">
                 <MaskedPhoto src={profilePhoto} />
             </div>
         </section>

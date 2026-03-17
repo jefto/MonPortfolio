@@ -2,9 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Règles globales responsive ──────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Touch targets minimum 44×44px */
+button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Filtres scrollables horizontalement sur mobile */
+.filters-scroll {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+}
+.filters-scroll::-webkit-scrollbar { display: none; }
+
 @layer utilities {
     .text-stroke {
-        -webkit-text-stroke: 2px black; /* épaisseur + couleur */
+        -webkit-text-stroke: 2px black;
     }
     .text-stroke-white {
         -webkit-text-stroke: 2px white;

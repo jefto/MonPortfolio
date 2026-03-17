@@ -18,11 +18,19 @@ const projectCategories = [
 
 // Réseaux sociaux
 const socialLinks = [
-    { name: "GitHub", url: "https://github.com", icon: FaGithub },
-    { name: "LinkedIn", url: "https://linkedin.com", icon: FaLinkedin },
-    { name: "Instagram", url: "https://instagram.com", icon: FaInstagram },
+    { name: "GitHub", url: "https://github.com/jefto", icon: FaGithub },
+    { name: "LinkedIn", url: "https://www.linkedin.com/in/jefto2/", icon: FaLinkedin },
+    { name: "Instagram", url: "https://www.instagram.com/jefto2.0/", icon: FaInstagram },
     { name: "WhatsApp", url: "https://wa.me/22891020171", icon: FaWhatsapp },
-    { name: "Twitter/X", url: "https://twitter.com", icon: FaXTwitter }
+    { name: "Twitter/X", url: "https://x.com/putamadre2_0", icon: FaXTwitter }
+];
+
+// Statistiques design
+const designStats = [
+    { label: "Maquettes créées", value: "5+" },
+    { label: "Affiches conçues", value: "10+" },
+    { label: "Logiciels maîtrisés", value: "6+" },
+    { label: "Inspirations infusées", value: "∞" }
 ];
 
 // Commandes de navigation (déplacées au top-level pour être stables dans les hooks)
@@ -316,7 +324,7 @@ export default function DesignPart() {
                 </svg>
             </div>
 
-            <div className="relative z-10 p-8 md:p-16">
+            <div className="relative z-10 p-4 sm:p-8 md:p-16">
                 {/* Bouton Retour */}
                 <button
                     onClick={() => handleNavigation('back', 'back')}
@@ -329,12 +337,12 @@ export default function DesignPart() {
                 </button>
 
                 {/* Header */}
-                <header className={`mb-16 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
+                <header className={`mb-10 md:mb-16 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
                     <div className="text-center">
-                        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-4 font-abril">
+                        <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-4 font-abril">
                             UI|UX Designer
                         </h1>
-                        <p className="text-gray-600 text-xl md:text-2xl font-poppins italic">
+                        <p className="text-gray-600 text-base sm:text-xl md:text-2xl font-poppins italic">
                             Créer des expériences visuelles mémorables
                         </p>
                     </div>
@@ -384,13 +392,13 @@ export default function DesignPart() {
                         <span className="text-pink-500">✦</span> Mes Réalisations
                     </h2>
 
-                    {/* Filtres */}
-                    <div className="flex flex-wrap gap-3 mb-6">
+                    {/* Filtres — scrollables horizontalement sur mobile */}
+                    <div className="filters-scroll mb-6">
                         {projectCategories.map((category) => (
                             <button
                                 key={category.id}
                                 onClick={() => setSelectedCategory(category.id)}
-                                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 font-poppins ${
+                                className={`flex-shrink-0 px-6 py-2 rounded-full font-semibold transition-all duration-300 font-poppins ${
                                     selectedCategory === category.id
                                         ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg shadow-pink-500/30'
                                         : 'bg-white text-gray-700 border-2 border-pink-200 hover:border-pink-400'
@@ -422,6 +430,23 @@ export default function DesignPart() {
                                 <p className="text-gray-500 text-lg font-poppins">Aucun projet dans cette catégorie</p>
                             </div>
                         )}
+                    </div>
+                </section>
+
+                {/* Section Stats Design */}
+                <section className={`mb-16 transition-all duration-1000 delay-650 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                    <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-pink-200 p-6 shadow-xl">
+                        <h3 className="text-lg font-semibold text-pink-500 mb-4 font-poppins flex items-center gap-2">
+                            <span>✦</span> palette.stats
+                        </h3>
+                        <div className="space-y-2 text-sm font-poppins">
+                            {designStats.map((stat, index) => (
+                                <p key={index} className="text-gray-700">
+                                    <span className="text-pink-400">{index === designStats.length - 1 ? '└──' : '├──'}</span>{' '}
+                                    {stat.label}: <span className="font-bold text-purple-600">{stat.value}</span>
+                                </p>
+                            ))}
+                        </div>
                     </div>
                 </section>
 
@@ -604,7 +629,7 @@ export default function DesignPart() {
 
                     {/* Terminal de navigation */}
                     {isNavigating && (
-                        <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-pink-200">
+                        <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-pink-200 p-4">
                             <div className="space-y-2 text-sm font-poppins">
                                 {navigationCommands[navigationData.type]?.slice(0, currentLineIndex).map((line, index) => (
                                     <p key={index} className="text-pink-600">
