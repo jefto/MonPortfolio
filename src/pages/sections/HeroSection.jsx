@@ -132,7 +132,7 @@ export default function HeroSection() {
         fetchCV();
     }, []);
 
-    const cvUrl = cvData ? getCVUrl(cvData) : "";
+    const cvUrl = cvData ? getCVUrl(cvData) : null;
     const cvFileName = cvData?.originalName || "CV.pdf";
 
     return (

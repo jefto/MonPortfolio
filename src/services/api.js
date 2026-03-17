@@ -205,20 +205,19 @@ export const getCV = async () => {
 
 /**
  * Construit l'URL de téléchargement du CV
- * Ajoute fl_attachment pour forcer le téléchargement côté Cloudinary
- * (l'attribut HTML "download" est ignoré pour les URLs cross-origin)
+ * Retourne l'URL Cloudinary brute — les transformations (fl_attachment) ne
+ * fonctionnent pas sur les ressources de type 'raw'. Le téléchargement est
+ * géré par l'attribut HTML download + le Content-Type PDF natif de Cloudinary.
  * @param {Object} cv - objet CV de l'API
- * @returns {string} URL complète du PDF avec flag téléchargement
+ * @returns {string|null} URL brute du PDF
  */
 export const getCVUrl = (cv) => {
-    if (!cv || !cv.filePath) return "";
-    const url = cv.filePath.startsWith("http") ? cv.filePath : `${BASE_URL}/${cv.filePath}`;
-    // Insérer fl_attachment dans l'URL Cloudinary raw → force Content-Disposition: attachment
-    // Transforme : /raw/upload/v.../  →  /raw/upload/fl_attachment/v.../
-    if (url.includes("cloudinary.com")) {
-        return url.replace("/upload/", "/upload/fl_attachment/");
+    if (!cv || !cv.filePath) return null;
+    // URL Cloudinary directe — pas de transformation, pas de fl_attachment
+    if (cv.filePath.startsWith("http://") || cv.filePath.startsWith("https://")) {
+        return cv.filePath;
     }
-    return url;
+    return `${BASE_URL}/${cv.filePath}`;
 };
 
 /**

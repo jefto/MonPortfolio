@@ -81,7 +81,7 @@ export default function CVManager() {
         setTimeout(() => setSuccessMsg(''), 3000);
     };
 
-    const cvUrl = cv ? getCVUrl(cv) : '';
+    const cvUrl = cv ? getCVUrl(cv) : null;
 
     const formatDate = (isoStr) => {
         if (!isoStr) return '';
