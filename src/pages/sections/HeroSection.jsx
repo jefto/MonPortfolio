@@ -132,7 +132,6 @@ export default function HeroSection() {
         fetchCV();
     }, []);
 
-    const cvFileName = cvData?.originalName || "CV.pdf";
 
     return (
         <section className="flex flex-col lg:flex-row gap-8 justify-center items-center min-h-screen px-4 sm:px-8 md:px-16 py-12 max-w-7xl mx-auto">
