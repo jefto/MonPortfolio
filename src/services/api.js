@@ -15,10 +15,29 @@ export const getImageUrl = (path) => {
 };
 
 /**
- * Appel API générique avec gestion d'erreurs
+ * Appel API générique avec gestion d'erreurs et injection du token admin.
  */
 const apiCall = async (url, options = {}) => {
-    const res = await fetch(url, options);
+    const token = localStorage.getItem('admin_token');
+
+    const headers = {
+        ...options.headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    // Ajouter Content-Type JSON uniquement si le body n'est pas un FormData
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    const res = await fetch(url, { ...options, headers });
+
+    // Token expiré ou invalide → déconnexion automatique
+    if (res.status === 401) {
+        localStorage.removeItem('admin_token');
+        window.location.href = '/admin/login';
+        return;
+    }
+
     const data = await res.json();
 
     if (!data.success) {

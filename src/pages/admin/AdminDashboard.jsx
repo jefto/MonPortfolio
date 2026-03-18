@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCode, FaPalette, FaFileAlt, FaHome, FaPlus } from 'react-icons/fa';
+import { FaCode, FaPalette, FaFileAlt, FaHome, FaPlus, FaSignOutAlt } from 'react-icons/fa';
 import ProjectManager from './ProjectManager';
 import SkillManager from './SkillManager';
 import CVManager from './CVManager';
@@ -14,6 +14,11 @@ const tabs = [
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('projects');
     const navigate = useNavigate();
+
+    const logout = () => {
+        localStorage.removeItem('admin_token');
+        window.location.href = '/admin/login';
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -29,13 +34,23 @@ export default function AdminDashboard() {
                                 Admin <span className="text-blue-600">Portfolio</span>
                             </h1>
                         </div>
-                        <button
-                            onClick={() => navigate('/')}
-                            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        >
-                            <FaHome />
-                            <span className="text-sm font-medium">Voir le site</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => navigate('/')}
+                                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                                <FaHome />
+                                <span className="text-sm font-medium hidden sm:inline">Voir le site</span>
+                            </button>
+                            <button
+                                onClick={logout}
+                                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Déconnexion"
+                            >
+                                <FaSignOutAlt />
+                                <span className="text-sm font-medium hidden sm:inline">Déconnexion</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -67,4 +82,3 @@ export default function AdminDashboard() {
         </div>
     );
 }
-
