@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { MatrixRain, TerminalWindow, GlowingCard, SectionTitle, AnimatedButton } from '../components/ui';
 import { getProjectById, mapToDetailProject } from '../services/api';
+import SEO from '../components/SEO';
 
 export default function DetailDevProject() {
     const { id } = useParams();
@@ -83,6 +84,14 @@ export default function DetailDevProject() {
 
     return (
         <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
+            {project && (
+                <SEO
+                    title={`${project.name} — Projet Dev | TCHAMIE Jephte`}
+                    description={project.description || `Détail du projet ${project.name} par TCHAMIE Jephte.`}
+                    path={`/dev/project/${id}`}
+                    image={project.coverImage}
+                />
+            )}
             <MatrixRain />
 
             {/* Grille de fond */}

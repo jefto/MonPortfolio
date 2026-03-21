@@ -12,7 +12,8 @@ import {
     FormInput,
     AnimatedButton
 } from '../components/ui';
-import { getProjects, mapToDevProject, getSkills, groupDevSkills } from '../services/api';
+import { getProjects, mapToDevProject, getSkills, groupDevSkills, getStatistics } from '../services/api';
+import SEO from '../components/SEO';
 
 // ============================================
 // DONNÉES - Modifier ici pour personnaliser
@@ -54,13 +55,7 @@ const projectCategories = [
 
 // Les projets sont maintenant chargés depuis l'API backend
 
-// Statistiques
-const statsData = [
-    { label: "Projets complétés", value: "8+" },
-    { label: "Années d'expérience", value: "1+" },
-    { label: "Technologies maîtrisées", value: "10+" },
-    { label: "Cafés consommés", value: "∞" }
-];
+// Les statistiques sont maintenant chargées depuis l'API backend
 
 // Informations de contact
 const contactInfo = {
@@ -109,6 +104,14 @@ export default function DevPart() {
     const [skillsData, setSkillsData] = useState({ langages: [], frameworks: [], databases: [], outils: [] });
     const [skillsLoading, setSkillsLoading] = useState(true);
 
+    // État pour les statistiques chargées depuis l'API
+    const [statsData, setStatsData] = useState([
+        { label: "Projets complétés", value: "..." },
+        { label: "Années d'expérience", value: "..." },
+        { label: "Technologies maîtrisées", value: "..." },
+        { label: "Cafés consommés", value: "∞" }
+    ]);
+
     // Charger les projets dev depuis l'API
     useEffect(() => {
         const fetchProjects = async () => {
@@ -141,6 +144,26 @@ export default function DevPart() {
             }
         };
         fetchSkills();
+    }, []);
+
+    // Charger les statistiques depuis l'API
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const data = await getStatistics();
+                if (data) {
+                    setStatsData([
+                        { label: "Projets complétés", value: `${data.completedProjects}+` },
+                        { label: "Années d'expérience", value: `${data.yearsExperience}+` },
+                        { label: "Technologies maîtrisées", value: `${data.masteredTechnologies}+` },
+                        { label: "Cafés consommés", value: "∞" }
+                    ]);
+                }
+            } catch (err) {
+                console.error("Erreur chargement statistiques:", err);
+            }
+        };
+        fetchStats();
     }, []);
 
     const handleContactSubmit = (e) => {
@@ -232,6 +255,11 @@ export default function DevPart() {
 
     return (
         <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
+            <SEO
+                title="Projets Développement — TCHAMIE Jephte"
+                description="Découvrez les projets de développement web de TCHAMIE Jephte : React, Node.js, Java, Spring Boot, applications fullstack, frontend et backend."
+                path="/dev"
+            />
             <MatrixRain />
 
             {/* Grille de fond */}
@@ -495,7 +523,7 @@ export default function DevPart() {
                 </section>
 
                 {/* Effet scanline */}
-                <div className="fixed inset-0 pointer-events-none z-20 opacity-[0.03]"
+                <div className="fixed inset-0 pointer-events-none z-20 opacity-[0.02]"
                     style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 0, 0.1) 2px, rgba(0, 255, 0, 0.1) 4px)' }}
                 />
             </div>

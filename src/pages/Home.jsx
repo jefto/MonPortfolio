@@ -7,6 +7,7 @@ import HeroSection from "./sections/HeroSection";
 import About from "./sections/About";
 import Study from "./sections/Study";
 import Contact from "./sections/Contact";
+import SEO from "../components/SEO";
 
 // Composant pour le background avec icônes
 function IconsBackground() {
@@ -42,7 +43,7 @@ function IconsBackground() {
             {icons.map((item, index) => (
                 <item.Icon
                     key={index}
-                    className="absolute text-blue-400/20 text-5xl md:text-6xl"
+                    className="absolute text-blue-400/[0.14] text-5xl md:text-6xl"
                     style={{ left: `${item.x}%`, top: `${item.y}%` }}
                 />
             ))}
@@ -53,6 +54,11 @@ function IconsBackground() {
 export default function Home() {
     return (
         <div className="min-h-screen relative">
+            <SEO
+                title="TCHAMIE Jephte — Développeur Web & UI/UX Designer | Portfolio"
+                description="Portfolio de TCHAMIE Jephte — Développeur Web Full-Stack et UI/UX Designer basé à Lomé, Togo. Spécialisé en React, Node.js, Java, Spring Boot et Figma."
+                path="/"
+            />
             {/* Background avec icônes */}
             <IconsBackground />
 

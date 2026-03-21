@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import SEO from "../../components/SEO";
 
 // Réseaux sociaux
 const socialLinks = [
@@ -64,6 +65,11 @@ export default function Contact() {
 
     return (
         <footer className="bg-gray-900 text-white py-4 px-8 md:px-16">
+            <SEO
+                title="Contact — TCHAMIE Jephte"
+                description="Contactez TCHAMIE Jephte, développeur web et UI/UX designer à Lomé, Togo. Email : jefftchamie@gmail.com | Tél : +228 91020171."
+                path="/contact"
+            />
             <div className="max-w-7xl mx-auto">
                 {/* Titre */}
                 <h2 className="text-4xl font-bold text-center mb-12 font-abril">

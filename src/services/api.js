@@ -268,6 +268,84 @@ export const deleteCV = async () => {
 };
 
 // ==========================================
+// ÉDUCATION (PARCOURS ACADÉMIQUE)
+// ==========================================
+
+/**
+ * Récupère tout le parcours académique
+ * @returns {Promise<Array>} tableau de formations
+ */
+export const getEducations = async () => {
+    const data = await apiCall(`${BASE_URL}/api/educations`);
+    return data.data;
+};
+
+/**
+ * Crée une nouvelle formation
+ * @param {Object} educationData - { startYear, endYear, title, school, description }
+ * @returns {Promise<Object>} objet Education créé
+ */
+export const createEducation = async (educationData) => {
+    const data = await apiCall(`${BASE_URL}/api/educations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(educationData),
+    });
+    return data.data;
+};
+
+/**
+ * Met à jour une formation
+ * @param {number|string} id
+ * @param {Object} educationData
+ * @returns {Promise<Object>} objet Education mis à jour
+ */
+export const updateEducation = async (id, educationData) => {
+    const data = await apiCall(`${BASE_URL}/api/educations/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(educationData),
+    });
+    return data.data;
+};
+
+/**
+ * Supprime une formation
+ * @param {number|string} id
+ */
+export const deleteEducation = async (id) => {
+    const data = await apiCall(`${BASE_URL}/api/educations/${id}`, { method: "DELETE" });
+    return data;
+};
+
+// ==========================================
+// STATISTIQUES
+// ==========================================
+
+/**
+ * Récupère les statistiques du portfolio
+ * @returns {Promise<Object>} objet Statistic
+ */
+export const getStatistics = async () => {
+    const data = await apiCall(`${BASE_URL}/api/statistics`);
+    return data.data;
+};
+
+/**
+ * Met à jour les statistiques du portfolio
+ * @param {Object} statsData - champs à mettre à jour
+ * @returns {Promise<Object>} objet Statistic mis à jour
+ */
+export const updateStatistics = async (statsData) => {
+    const data = await apiCall(`${BASE_URL}/api/statistics`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(statsData),
+    });
+    return data.data;
+};
+
+// ==========================================
 // HELPERS DE MAPPING
 // ==========================================
 

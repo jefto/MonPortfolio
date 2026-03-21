@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import emailjs from "@emailjs/browser";
 import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { getProjects, mapToDesignProject, getSkills, groupDesignSkills } from '../services/api';
+import { getProjects, mapToDesignProject, getSkills, groupDesignSkills, getStatistics } from '../services/api';
+import SEO from '../components/SEO';
 
 // Les compétences design sont maintenant chargées depuis l'API backend
 
@@ -25,13 +26,7 @@ const socialLinks = [
     { name: "Twitter/X", url: "https://x.com/putamadre2_0", icon: FaXTwitter }
 ];
 
-// Statistiques design
-const designStats = [
-    { label: "Maquettes créées", value: "5+" },
-    { label: "Affiches conçues", value: "10+" },
-    { label: "Logiciels maîtrisés", value: "6+" },
-    { label: "Inspirations infusées", value: "∞" }
-];
+// Les statistiques design sont maintenant chargées depuis l'API backend
 
 // Commandes de navigation (déplacées au top-level pour être stables dans les hooks)
 const navigationCommands = {
@@ -136,6 +131,14 @@ export default function DesignPart() {
     const [skillsData, setSkillsData] = useState({ design: [], prototyping: [], other: [] });
     const [skillsLoading, setSkillsLoading] = useState(true);
 
+    // État pour les statistiques chargées depuis l'API
+    const [designStats, setDesignStats] = useState([
+        { label: "Maquettes créées", value: "..." },
+        { label: "Affiches conçues", value: "..." },
+        { label: "Logiciels maîtrisés", value: "..." },
+        { label: "Inspirations infusées", value: "∞" }
+    ]);
+
     // Charger les projets design depuis l'API
     useEffect(() => {
         const fetchProjects = async () => {
@@ -168,6 +171,26 @@ export default function DesignPart() {
             }
         };
         fetchSkills();
+    }, []);
+
+    // Charger les statistiques design depuis l'API
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const data = await getStatistics();
+                if (data) {
+                    setDesignStats([
+                        { label: "Maquettes créées", value: `${data.mockupsCreated}+` },
+                        { label: "Affiches conçues", value: `${data.postersDesigned}+` },
+                        { label: "Logiciels maîtrisés", value: `${data.masteredSoftware}+` },
+                        { label: "Inspirations infusées", value: "∞" }
+                    ]);
+                }
+            } catch (err) {
+                console.error("Erreur chargement statistiques design:", err);
+            }
+        };
+        fetchStats();
     }, []);
 
     useEffect(() => {
@@ -262,8 +285,13 @@ export default function DesignPart() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 relative overflow-hidden">
+            <SEO
+                title="Projets Design — TCHAMIE Jephte"
+                description="Découvrez les créations design de TCHAMIE Jephte : maquettes UI/UX, affiches, prototypage Figma, design graphique."
+                path="/design"
+            />
             {/* Motifs décoratifs en arrière-plan */}
-            <div className="fixed inset-0 pointer-events-none opacity-10">
+            <div className="fixed inset-0 pointer-events-none opacity-[0.07]">
                 <div className="absolute top-20 left-10 w-32 h-32 bg-pink-300 rounded-full blur-3xl" />
                 <div className="absolute top-40 right-20 w-40 h-40 bg-purple-300 rounded-full blur-3xl" />
                 <div className="absolute bottom-32 left-1/4 w-36 h-36 bg-blue-300 rounded-full blur-3xl" />
@@ -271,7 +299,7 @@ export default function DesignPart() {
             </div>
 
             {/* Patterns topographiques animés */}
-            <div className="fixed inset-0 pointer-events-none opacity-50">
+            <div className="fixed inset-0 pointer-events-none opacity-[0.35]">
                 <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         {/* Pattern topographique 1 */}

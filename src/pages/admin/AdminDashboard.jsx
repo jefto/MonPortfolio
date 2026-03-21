@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCode, FaPalette, FaFileAlt, FaHome, FaPlus, FaSignOutAlt } from 'react-icons/fa';
+import { FaCode, FaPalette, FaFileAlt, FaHome, FaPlus, FaSignOutAlt, FaGraduationCap, FaChartBar } from 'react-icons/fa';
 import ProjectManager from './ProjectManager';
 import SkillManager from './SkillManager';
 import CVManager from './CVManager';
+import EducationManager from './EducationManager';
+import StatisticManager from './StatisticManager';
 
 const tabs = [
     { id: 'projects', label: 'Projets', icon: FaCode },
     { id: 'skills', label: 'Compétences', icon: FaPalette },
     { id: 'cv', label: 'CV', icon: FaFileAlt },
+    { id: 'education', label: 'Parcours', icon: FaGraduationCap },
+    { id: 'statistics', label: 'Statistiques', icon: FaChartBar },
 ];
 
 export default function AdminDashboard() {
@@ -78,6 +82,8 @@ export default function AdminDashboard() {
                 {activeTab === 'projects' && <ProjectManager />}
                 {activeTab === 'skills' && <SkillManager />}
                 {activeTab === 'cv' && <CVManager />}
+                {activeTab === 'education' && <EducationManager />}
+                {activeTab === 'statistics' && <StatisticManager />}
             </div>
         </div>
     );

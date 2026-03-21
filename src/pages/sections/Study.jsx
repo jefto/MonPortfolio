@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react';
+import { getEducations } from '../../services/api';
+import SEO from '../../components/SEO';
 
-// Données du parcours académique
-const parcoursData = [
+// Données statiques de fallback (utilisées si l'API échoue)
+const fallbackData = [
     {
         annee: "2023 - Actuellement",
         diplome: "Licence Professionnelle Génie Logiciel",
@@ -21,14 +24,54 @@ const parcoursData = [
     }
 ];
 
+const formatEducation = (edu) => ({
+    annee: edu.endYear === null
+        ? `${edu.startYear} - Actuellement`
+        : `${edu.startYear} - ${edu.endYear}`,
+    diplome: edu.title,
+    etablissement: edu.school,
+    description: edu.description || '',
+});
+
 export default function Study() {
+    const [parcoursData, setParcoursData] = useState(fallbackData);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchEducations = async () => {
+            try {
+                const data = await getEducations();
+                if (data && data.length > 0) {
+                    setParcoursData(data.map(formatEducation));
+                }
+            } catch (err) {
+                console.error("Erreur chargement parcours:", err);
+                // Garder les données de fallback
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchEducations();
+    }, []);
+
     return (
         <section className="px-8 md:px-16 py-16">
+            <SEO
+                title="Parcours Académique — TCHAMIE Jephte"
+                description="Parcours académique de TCHAMIE Jephte : École Polytechnique de Lomé, formation en génie logiciel et développement web."
+                path="/skill"
+            />
             <div className="max-w-7xl mx-auto">
                 <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center font-abril">
                     Parcours <span className="text-blue-500">Académique</span>
                 </h2>
 
+                {loading ? (
+                    <div className="text-center py-16">
+                        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3" />
+                        <p className="text-gray-500 text-sm">Chargement du parcours...</p>
+                    </div>
+                ) : (
                 <div className="relative font-poppins">
                     {/* Ligne verticale */}
                     <div className="absolute left-4  md:left-1/2 top-0 bottom-0 w-0.5 bg-blue-500" />
@@ -63,6 +106,7 @@ export default function Study() {
                         </div>
                     ))}
                 </div>
+                )}
             </div>
         </section>
     );

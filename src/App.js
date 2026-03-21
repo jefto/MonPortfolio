@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import Home from "./pages/Home";
 import About from "./pages/sections/About";
 import Contact from "./pages/sections/Contact";
@@ -13,6 +14,7 @@ import PrivateRoute from "./components/PrivateRoute";
 
 export default function App() {
     return (
+        <HelmetProvider>
         <BrowserRouter>
             <div className="min-h-screen w-full overflow-auto bg-white">
                 <Routes>
@@ -33,5 +35,6 @@ export default function App() {
                 </Routes>
             </div>
         </BrowserRouter>
+        </HelmetProvider>
     );
 }

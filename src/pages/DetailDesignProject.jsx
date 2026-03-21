@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getProjectById, mapToDetailProject } from '../services/api';
+import SEO from '../components/SEO';
 
 export default function DetailDesignProject() {
     const { id } = useParams();
@@ -81,6 +82,14 @@ export default function DetailDesignProject() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 relative overflow-hidden">
+            {project && (
+                <SEO
+                    title={`${project.name} — Projet Design | TCHAMIE Jephte`}
+                    description={project.description || `Détail du projet design ${project.name} par TCHAMIE Jephte.`}
+                    path={`/design/project/${id}`}
+                    image={project.coverImage}
+                />
+            )}
             {/* Motifs décoratifs */}
             <div className="fixed inset-0 pointer-events-none opacity-10">
                 <div className="absolute top-20 left-10 w-32 h-32 bg-pink-300 rounded-full blur-3xl" />
@@ -217,7 +226,7 @@ export default function DetailDesignProject() {
 
                     <img
                         src={selectedImage}
-                        alt="Preview"
+                        alt={`${project.name} - Vue en grand`}
                         className="max-w-full max-h-full object-contain rounded-lg"
                         onClick={(e) => e.stopPropagation()}
                     />

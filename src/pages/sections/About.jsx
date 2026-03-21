@@ -1,10 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import SEO from "../../components/SEO";
 
 export default function About() {
     const navigate = useNavigate();
 
     return (
         <section className="px-8 md:px-16 py-16 bg-gray-300">
+            <SEO
+                title="À Propos — TCHAMIE Jephte"
+                description="Découvrez le profil de TCHAMIE Jephte, développeur web full-stack et UI/UX designer basé à Lomé, Togo. Expertise en React, Java, Spring Boot, Figma."
+                path="/about"
+            />
             <div className="max-w-7xl mx-auto">
                 <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center font-abril">
                     À <span className="text-blue-500">Propos</span>
