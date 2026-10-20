@@ -1,0 +1,20 @@
+name: Keep Alive Supabase and Backend
+
+on:
+  schedule:
+    # Ping toutes les 14 minutes pour garantir que le backend et Supabase restent actifs
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    name: Ping Backend & Database
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping Keep-Alive
+        run: |
+          URL="https://portfolio-backend-4mj2.onrender.com/api/keep-alive"
+          echo "Pinging $URL..."
+          curl -s -f -m 120 "$URL" || echo "Server waking up or temporary timeout"

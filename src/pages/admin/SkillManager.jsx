@@ -26,7 +26,6 @@ Object.values(TYPE_OPTIONS).flat().forEach(t => { TYPE_LABELS[t.value] = t.label
 
 const emptyForm = {
     name: '',
-    level: 50,
     category: 'dev',
     type: 'langage-de-programmation',
 };
@@ -71,7 +70,6 @@ export default function SkillManager() {
     const openEdit = (skill) => {
         setForm({
             name: skill.name,
-            level: skill.level,
             category: skill.category,
             type: skill.type,
         });
@@ -88,17 +86,17 @@ export default function SkillManager() {
         try {
             const payload = {
                 name: form.name,
-                level: parseInt(form.level, 10),
+                level: 100,
                 category: form.category,
                 type: form.type,
             };
 
             if (editingId) {
                 await updateSkill(editingId, payload);
-                showSuccess('Compétence modifiée !');
+                showSuccess('Compétence modifiée');
             } else {
                 await createSkill(payload);
-                showSuccess('Compétence ajoutée !');
+                showSuccess('Compétence ajoutée');
             }
 
             setShowForm(false);
@@ -206,19 +204,6 @@ export default function SkillManager() {
                                     placeholder="React, Figma, PostgreSQL..." />
                             </div>
 
-                            {/* Niveau */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Niveau : <span className="text-purple-600 font-bold">{form.level}%</span>
-                                </label>
-                                <input type="range" min="0" max="100" value={form.level}
-                                    onChange={(e) => setForm({ ...form, level: e.target.value })}
-                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600" />
-                                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                    <span>0%</span><span>50%</span><span>100%</span>
-                                </div>
-                            </div>
-
                             {/* Catégorie */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie *</label>
@@ -285,30 +270,15 @@ export default function SkillManager() {
                                     <div key={skill.id}
                                         className="flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors">
                                         {/* Nom */}
-                                        <div className="flex-1 min-w-0">
+                                        <div className="flex-1 min-w-0 flex items-center gap-3">
                                             <p className="font-medium text-gray-800 text-sm">{skill.name}</p>
-                                            <span className={`text-xs px-1.5 py-0.5 rounded ${
+                                            <span className={`text-xs px-2 py-0.5 rounded ${
                                                 skill.category === 'dev'
                                                     ? 'bg-green-50 text-green-600'
                                                     : 'bg-pink-50 text-pink-600'
                                             }`}>
                                                 {skill.category === 'dev' ? 'Dev' : 'Design'}
                                             </span>
-                                        </div>
-
-                                        {/* Barre de niveau */}
-                                        <div className="w-32 flex items-center gap-2">
-                                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                <div
-                                                    className={`h-full rounded-full transition-all ${
-                                                        skill.level >= 80 ? 'bg-green-500' :
-                                                        skill.level >= 50 ? 'bg-blue-500' :
-                                                        skill.level >= 25 ? 'bg-yellow-500' : 'bg-red-400'
-                                                    }`}
-                                                    style={{ width: `${skill.level}%` }}
-                                                />
-                                            </div>
-                                            <span className="text-xs font-medium text-gray-600 w-8 text-right">{skill.level}%</span>
                                         </div>
 
                                         {/* Actions */}
@@ -333,4 +303,3 @@ export default function SkillManager() {
         </div>
     );
 }
-

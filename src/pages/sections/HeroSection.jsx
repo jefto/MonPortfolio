@@ -1,192 +1,219 @@
 import { useState, useEffect } from "react";
-import { MdOutlineLocalPhone } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { MdOutlineFileDownload } from "react-icons/md";
+import { FaWhatsapp } from "react-icons/fa";
 import { TfiEmail } from "react-icons/tfi";
 import profilePhoto from "../../assets/tof.jpg";
-import { getCV, downloadCV } from "../../services/api";
-
-// Couleurs du thème
-const theme = {
-    primary: "#3B82F6",
-    white: "#FFFFFF",
-};
-
-// Composant pour l'effet de masque multi-rectangles
-function MaskedPhoto({ src }) {
-    const borderColor = theme.white;
-
-    return (
-        <div className="relative w-96 full">
-            {/* Effet de lumière bleue en arrière-plan - forme circulaire irrégulière */}
-            <div
-                className="absolute -z-10 w-[140%] h-[130%] -top-[10%] -left-[15%] blur-[50px]"
-                style={{
-                    background: `
-                        radial-gradient(ellipse 80% 70% at 30% 40%, rgba(59, 130, 246, 1) 0%, rgba(59, 130, 246, 0.5) 40%, transparent 70%),
-                        radial-gradient(ellipse 60% 80% at 70% 60%, rgba(96, 165, 250, 0.95) 0%, rgba(96, 165, 250, 0.4) 35%, transparent 65%),
-                        radial-gradient(ellipse 90% 60% at 50% 30%, rgba(37, 99, 235, 0.9) 0%, rgba(37, 99, 235, 0.3) 30%, transparent 70%)
-                    `,
-                    borderRadius: '60% 40% 50% 70% / 50% 60% 40% 50%'
-                }}
-            />
-
-            <svg
-                className="w-full h-full drop-shadow-2xl"
-                viewBox="0 0 320 384"
-                preserveAspectRatio="xMidYMid slice"
-            >
-                <defs>
-                    <pattern
-                        id="photoPattern"
-                        patternUnits="userSpaceOnUse"
-                        width="320"
-                        height="384"
-                    >
-                        <image
-                            href={src}
-                            x="0"
-                            y="0"
-                            width="320"
-                            height="384"
-                            preserveAspectRatio="xMidYMin slice"
-                        />
-                    </pattern>
-                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#3B82F6" floodOpacity="0.3"/>
-                    </filter>
-                    {/* Filtre pour l'effet hover - ombre bleue intense */}
-                    <filter id="shadowHover" x="-30%" y="-30%" width="160%" height="160%">
-                        <feDropShadow dx="0" dy="6" stdDeviation="15" floodColor="#3B82F6" floodOpacity="0.8"/>
-                    </filter>
-                </defs>
-
-                <style>
-                    {`
-                        .photo-rect {
-                            transition: all 0.3s ease;
-                            cursor: pointer;
-                        }
-                        .photo-rect:hover {
-                            filter: url(#shadowHover);
-                            transform: scale(1.05);
-                            transform-origin: center;
-                        }
-                    `}
-                </style>
-
-                {/* Forme principale en L (style pistolet) */}
-                <path
-                    className="photo-rect"
-                    d="M 18 10
-                       L 217 10
-                       Q 225 10 225 18
-                       L 225 117
-                       Q 225 125 217 125
-                       L 103 125
-                       Q 95 125 95 133
-                       L 95 162
-                       Q 95 170 87 170
-                       L 18 170
-                       Q 10 170 10 162
-                       L 10 18
-                       Q 10 10 18 10
-                       Z"
-                    fill="url(#photoPattern)"
-                    stroke={borderColor}
-                    strokeWidth="3"
-                    filter="url(#shadow)"
-                />
-
-                <rect className="photo-rect" x="15" y="185" width="80" height="90" rx="8"
-                      fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-                <rect className="photo-rect" x="115" y="140" width="110" height="90" rx="8"
-                      fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-                <rect className="photo-rect" x="115" y="245" width="180" height="85" rx="8"
-                      fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-                <rect className="photo-rect" x="240" y="10" width="55" height="70" rx="8"
-                      fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-                <rect className="photo-rect" x="240" y="95" width="55" height="135" rx="8"
-                      fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-                <rect className="photo-rect" x="15" y="290" width="80" height="40" rx="8"
-                      fill="url(#photoPattern)" stroke={borderColor} strokeWidth="3" filter="url(#shadow)" />
-            </svg>
-        </div>
-    );
-}
+import { HeroFramedPhoto } from "../../components/ui";
+import {
+    getCV,
+    downloadCV,
+    getStatistics,
+    formatWhatsAppUrl,
+    DEFAULT_CONTACT_INFO,
+} from "../../services/api";
 
 export default function HeroSection() {
+    const navigate = useNavigate();
     const [cvData, setCvData] = useState(null);
     const [cvLoading, setCvLoading] = useState(true);
+    const [contactInfo, setContactInfo] = useState(DEFAULT_CONTACT_INFO);
+    const [heroFraming, setHeroFraming] = useState({
+        heroPhotoUrl: "",
+        heroPhotoScale: 1.0,
+        heroPhotoX: 0.0,
+        heroPhotoY: 0.0,
+    });
 
     useEffect(() => {
-        const fetchCV = async () => {
+        const fetchHeroData = async () => {
             try {
-                const cv = await getCV();
+                const [cv, stats] = await Promise.all([
+                    getCV().catch(() => null),
+                    getStatistics().catch(() => null),
+                ]);
                 setCvData(cv);
+                if (stats) {
+                    setContactInfo({
+                        contactPhone: stats.contactPhone || DEFAULT_CONTACT_INFO.contactPhone,
+                        contactEmail: stats.contactEmail || DEFAULT_CONTACT_INFO.contactEmail,
+                        contactLocation: stats.contactLocation || DEFAULT_CONTACT_INFO.contactLocation,
+                    });
+                    setHeroFraming({
+                        heroPhotoUrl: stats.heroPhotoUrl || "",
+                        heroPhotoScale: stats.heroPhotoScale !== undefined ? Number(stats.heroPhotoScale) : 1.0,
+                        heroPhotoX: stats.heroPhotoX !== undefined ? Number(stats.heroPhotoX) : 0.0,
+                        heroPhotoY: stats.heroPhotoY !== undefined ? Number(stats.heroPhotoY) : 0.0,
+                    });
+                }
             } catch (err) {
-                console.error("Erreur chargement CV:", err);
+                console.error("Erreur chargement Hero:", err);
             } finally {
                 setCvLoading(false);
             }
         };
-        fetchCV();
+        fetchHeroData();
     }, []);
 
+    const activePhoto = heroFraming.heroPhotoUrl || profilePhoto;
 
     return (
-        <section className="flex flex-col lg:flex-row gap-8 justify-center items-center min-h-screen px-4 sm:px-8 md:px-16 py-12 max-w-7xl mx-auto">
-            {/* Section Texte */}
-            <div className="flex flex-col gap-4 text-center lg:text-left lg:flex-1 w-full max-w-lg lg:max-w-none">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight text-gray-800 font-poppins">
-                    HELLO! I'M{' '}
-                    <em className="font-bold not-italic text-blue-500 block mt-2 font-abril">
-                        TCHAMIE JEPHTE
-                    </em>
-                </h1>
+        <section className="relative px-4 sm:px-8 md:px-16 pt-6 sm:pt-8 md:pt-10 pb-14 md:pb-20 overflow-hidden">
+            {/* Figures architecturales en arrière-plan */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                {/* Anneaux orbitaux dorés / architecturaux côté droit */}
+                <svg
+                    className="absolute right-[-4%] top-[-8%] w-[520px] h-[520px] text-zinc-900/15"
+                    viewBox="0 0 500 500"
+                    fill="none"
+                >
+                    <circle cx="250" cy="250" r="220" stroke="currentColor" strokeWidth="1.5" strokeDasharray="8 8" />
+                    <circle cx="250" cy="250" r="165" stroke="currentColor" strokeWidth="1.5" />
+                    <circle cx="250" cy="250" r="110" stroke="#d97706" strokeOpacity="0.35" strokeWidth="1.5" strokeDasharray="4 4" />
+                    <path d="M 30 250 L 470 250 M 250 30 L 250 470" stroke="currentColor" strokeWidth="1.2" />
+                    <rect x="135" y="135" width="230" height="230" stroke="currentColor" strokeWidth="1.2" transform="rotate(45 250 250)" />
+                </svg>
 
-                <p className="text-xl sm:text-2xl md:text-3xl leading-tight text-gray-700 font-poppins">
-                    INGENIEUR{' '}
-                    <em className="not-italic text-blue-600 font-semibold">GENIE LOGICIEL</em>
-                </p>
-                <em className="text-xl sm:text-2xl md:text-3xl leading-tight text-gray-700 font-poppins">&</em>
-                <p className="text-xl sm:text-2xl md:text-3xl leading-tight text-gray-700 font-allan">
-                    <em className="not-italic text-blue-500 font-semibold">UI | UX</em>{' '}DESIGNER
-                </p>
-
-                {/* Boutons d'action */}
-                <div className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start pt-6 gap-3 sm:gap-4 font-poppins">
-                    <div className="flex flex-row items-center justify-center gap-3">
-                        <MdOutlineLocalPhone className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600 flex-shrink-0" />
-                        <p className="font-bold text-gray-700 text-sm">91020171</p>
-                    </div>
-
-                    {cvLoading ? (
-                        <div className="flex flex-row w-full sm:w-44 h-12 items-center justify-center bg-blue-400 rounded-full py-2 text-white shadow-lg shadow-blue-500/30 cursor-wait opacity-70">
-                            <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2" />
-                            <p className="p-2 font-semibold text-sm">Chargement...</p>
-                        </div>
-                    ) : cvData ? (
-                        <button onClick={downloadCV} className="flex flex-row w-full sm:w-44 h-12 items-center justify-center bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-full py-2 transition-colors text-white shadow-lg shadow-blue-500/30 cursor-pointer">
-                            <MdOutlineFileDownload className="h-8 w-8" />
-                            <p className="p-2 font-semibold text-sm">Download CV</p>
-                        </button>
-                    ) : (
-                        <div className="flex flex-row w-full sm:w-44 h-12 items-center justify-center bg-gray-400 rounded-full py-2 text-white shadow-lg opacity-50 cursor-not-allowed">
-                            <MdOutlineFileDownload className="h-8 w-8" />
-                            <p className="p-2 font-semibold text-sm">CV indisponible</p>
-                        </div>
-                    )}
-
-                    <div className="flex flex-row items-center justify-center gap-3">
-                        <TfiEmail className="h-10 w-10 bg-blue-100 rounded-full p-2 text-blue-600 flex-shrink-0" />
-                        <p className="font-bold text-gray-700 text-sm break-all">jefftchamie@gmail.com</p>
-                    </div>
-                </div>
+                {/* Polygone géométrique côté gauche */}
+                <svg
+                    className="absolute -left-16 bottom-0 w-[380px] h-[380px] text-blue-600/20"
+                    viewBox="0 0 360 360"
+                    fill="none"
+                >
+                    <polygon points="180,20 340,180 180,340 20,180" stroke="currentColor" strokeWidth="1.6" />
+                    <polygon points="180,65 295,180 180,295 65,180" stroke="currentColor" strokeWidth="1.4" strokeDasharray="6 6" />
+                    <circle cx="180" cy="180" r="45" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
             </div>
 
-            {/* Section Photo — cachée sur très petit écran, réduite sur mobile */}
-            <div className="hidden sm:flex lg:flex-1 justify-center items-center w-full max-w-xs sm:max-w-sm lg:max-w-none">
-                <MaskedPhoto src={profilePhoto} />
+            <div className="max-w-7xl mx-auto relative z-10">
+                <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 justify-between items-center">
+                    {/* Colonne Éditoriale & Double Compétence */}
+                    <div className="flex flex-col gap-5 text-left lg:flex-1 w-full">
+                        <div className="inline-flex items-center gap-3 w-fit px-3.5 py-1.5 rounded-full bg-white border border-zinc-300 text-xs font-mono text-zinc-800">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                            <span>LOMÉ, TOGO — INGÉNIERIE LOGICIELLE &amp; DIRECTION DESIGN</span>
+                        </div>
+
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl leading-[1.08] text-zinc-950 font-abril tracking-tight">
+                            TCHAMIE JEPHTE
+                        </h1>
+
+                        <div className="flex flex-wrap items-center gap-3 text-lg sm:text-2xl font-poppins font-semibold text-zinc-900">
+                            <span className="px-3.5 py-1 rounded bg-zinc-950 text-white font-mono text-sm sm:text-base">
+                                01 // INGÉNIEUR GÉNIE LOGICIEL
+                            </span>
+                            <span className="text-zinc-400 font-mono">&amp;</span>
+                            <span className="px-3.5 py-1 rounded bg-amber-500/20 border border-amber-600/40 text-amber-900 font-mono text-sm sm:text-base">
+                                02 // UI/UX &amp; BRAND DESIGNER
+                            </span>
+                        </div>
+
+                        <p className="text-zinc-600 text-base sm:text-lg leading-relaxed max-w-2xl font-poppins">
+                            Conception d&apos;architectures web full-stack (React, Node.js, Java, Spring Boot, PostgreSQL) et réalisation de systèmes d&apos;interfaces, prototypes Figma et identités visuelles.
+                        </p>
+
+                        {/* Accès Immédiat aux 2 Univers (Immanquable dès le Hero) */}
+                        <div className="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-xl">
+                            <motion.button
+                                type="button"
+                                onClick={() => navigate("/dev")}
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                className="group flex items-center justify-between px-5 py-4 rounded-xl bg-zinc-950 text-white border border-zinc-950 hover:bg-zinc-900 transition-colors text-left"
+                            >
+                                <div>
+                                    <span className="block font-mono text-[10px] uppercase tracking-widest text-emerald-400">
+                                        UNIVERS 01 · CODE &amp; ARCHI
+                                    </span>
+                                    <span className="font-semibold text-sm sm:text-base">
+                                        Explorer l&apos;Engineering
+                                    </span>
+                                </div>
+                                <span className="font-mono text-lg text-emerald-400 group-hover:translate-x-1 transition-transform">
+                                    →
+                                </span>
+                            </motion.button>
+
+                            <motion.button
+                                type="button"
+                                onClick={() => navigate("/design")}
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                className="group flex items-center justify-between px-5 py-4 rounded-xl bg-white text-zinc-950 border border-zinc-900 hover:bg-amber-500 hover:border-amber-500 transition-colors text-left"
+                            >
+                                <div>
+                                    <span className="block font-mono text-[10px] uppercase tracking-widest text-amber-700 group-hover:text-zinc-950">
+                                        UNIVERS 02 · UI/UX &amp; BRAND
+                                    </span>
+                                    <span className="font-semibold text-sm sm:text-base">
+                                        Explorer le Studio Design
+                                    </span>
+                                </div>
+                                <span className="font-mono text-lg text-zinc-950 group-hover:translate-x-1 transition-transform">
+                                    →
+                                </span>
+                            </motion.button>
+                        </div>
+
+                        {/* Barre de coordonnées & Téléchargement CV */}
+                        <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-zinc-200 text-sm font-poppins">
+                            {cvLoading ? (
+                                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-200 text-zinc-600 rounded-lg font-mono text-xs">
+                                    <span className="animate-spin w-3.5 h-3.5 border-2 border-zinc-600 border-t-transparent rounded-full" />
+                                    Vérification du CV...
+                                </div>
+                            ) : cvData ? (
+                                <button
+                                    type="button"
+                                    onClick={downloadCV}
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-xs uppercase tracking-wider transition-colors"
+                                >
+                                    <MdOutlineFileDownload className="text-base" />
+                                    Télécharger le CV (PDF)
+                                </button>
+                            ) : (
+                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-100 border border-zinc-300 text-zinc-500 rounded-lg font-mono text-xs">
+                                    CV sur demande
+                                </span>
+                            )}
+
+                            <a
+                                href={formatWhatsAppUrl(contactInfo.contactPhone)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Discuter directement sur WhatsApp"
+                                className="inline-flex items-center gap-2 text-zinc-700 hover:text-emerald-700 font-mono text-xs transition-colors"
+                            >
+                                <FaWhatsapp className="text-base text-emerald-600" />
+                                <span>{contactInfo.contactPhone}</span>
+                            </a>
+
+                            <a
+                                href={`mailto:${contactInfo.contactEmail}`}
+                                className="inline-flex items-center gap-2 text-zinc-700 hover:text-zinc-950 font-mono text-xs transition-colors"
+                            >
+                                <TfiEmail className="text-sm text-blue-600" />
+                                <span>{contactInfo.contactEmail}</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Colonne Portrait Architectural avec cadrage dynamique */}
+                    <div className="flex lg:flex-none justify-center items-center">
+                        <HeroFramedPhoto
+                            src={activePhoto}
+                            scale={heroFraming.heroPhotoScale}
+                            x={heroFraming.heroPhotoX}
+                            y={heroFraming.heroPhotoY}
+                            interactive={true}
+                            id="hero_main"
+                        />
+                    </div>
+                </div>
             </div>
         </section>
     );

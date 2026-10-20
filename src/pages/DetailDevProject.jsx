@@ -4,6 +4,7 @@ import { FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { MatrixRain, TerminalWindow, GlowingCard, SectionTitle, AnimatedButton } from '../components/ui';
 import { getProjectById, mapToDetailProject } from '../services/api';
 import SEO from '../components/SEO';
+import Navbar from '../components/Navbar';
 
 export default function DetailDevProject() {
     const { id } = useParams();
@@ -83,7 +84,7 @@ export default function DetailDevProject() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
+        <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-x-hidden">
             {project && (
                 <SEO
                     title={`${project.name} — Projet Dev | TCHAMIE Jephte`}
@@ -92,6 +93,7 @@ export default function DetailDevProject() {
                     image={project.coverImage}
                 />
             )}
+            <Navbar variant="dark" />
             <MatrixRain />
 
             {/* Grille de fond */}

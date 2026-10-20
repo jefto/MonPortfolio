@@ -1,101 +1,156 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/img.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#3B82F6" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="theme-color" content="#09090b" />
 
-    <!-- SEO — Meta de base -->
-    <title>TCHAMIE Jephte — Développeur Web & UI/UX Designer | Portfolio</title>
+    <!-- SEO — Balises fondamentales Google -->
+    <title>TCHAMIE Jephte — Ingénieur Logiciel &amp; UI/UX Designer | Portfolio</title>
     <meta
       name="description"
-      content="Portfolio de TCHAMIE Jephte — Développeur Web Full-Stack et UI/UX Designer basé à Lomé, Togo. Spécialisé en React, Node.js, Java, Spring Boot et Figma. Découvrez mes projets, compétences et parcours."
+      content="Portfolio officiel de TCHAMIE Jephte — Ingénieur Génie Logiciel Full-Stack &amp; Designer UI/UX basé à Lomé, Togo. Architectures web React, Node.js, Java, Spring Boot, PostgreSQL et systèmes de design Figma."
     />
     <meta name="author" content="TCHAMIE Jephte" />
     <meta
       name="keywords"
-      content="TCHAMIE Jephte, TCHAMIE, Jephte, développeur web, UI/UX designer, portfolio, React, Node.js, Java, Spring Boot, Figma, Lomé, Togo, fullstack, frontend, backend, développeur Togo"
+      content="TCHAMIE Jephte, Jephte Tchamie, Ingénieur Génie Logiciel, Ingénieur Logiciel Togo, Développeur Full-Stack Lomé, UI/UX Designer Togo, React, Node.js, Java, Spring Boot, Figma, PostgreSQL, Développeur Web Afrique"
     />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
     <link rel="canonical" href="https://tchamie-jephte-portfolio.vercel.app/" />
 
-    <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="TCHAMIE Jephte — Développeur Web & UI/UX Designer" />
-    <meta property="og:description" content="Portfolio de TCHAMIE Jephte — Développeur Web Full-Stack et UI/UX Designer basé à Lomé, Togo. React, Node.js, Java, Figma." />
+    <!-- Balises Open Graph (Facebook, LinkedIn, WhatsApp) -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content="TCHAMIE Jephte — Ingénieur Logiciel &amp; UI/UX Designer" />
+    <meta
+      property="og:description"
+      content="Découvrez les réalisations de TCHAMIE Jephte : architectures logicielles React/Node/Java et direction artistique UI/UX Figma."
+    />
     <meta property="og:url" content="https://tchamie-jephte-portfolio.vercel.app/" />
     <meta property="og:image" content="https://tchamie-jephte-portfolio.vercel.app/img.png" />
-    <meta property="og:image:alt" content="TCHAMIE Jephte — Portfolio" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="TCHAMIE Jephte — Ingénieur Logiciel et UI/UX Designer" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:site_name" content="TCHAMIE Jephte Portfolio" />
 
-    <!-- Twitter Card -->
+    <!-- Balises Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TCHAMIE Jephte — Développeur Web & UI/UX Designer" />
-    <meta name="twitter:description" content="Portfolio de TCHAMIE Jephte — Développeur Web Full-Stack et UI/UX Designer basé à Lomé, Togo." />
+    <meta name="twitter:site" content="@putamadre2_0" />
+    <meta name="twitter:creator" content="@putamadre2_0" />
+    <meta name="twitter:title" content="TCHAMIE Jephte — Ingénieur Logiciel &amp; UI/UX Designer" />
+    <meta
+      name="twitter:description"
+      content="Portfolio de TCHAMIE Jephte : développement web Full-Stack (React, Node.js, Java) et design d'interfaces UI/UX (Figma)."
+    />
     <meta name="twitter:image" content="https://tchamie-jephte-portfolio.vercel.app/img.png" />
 
-    <!-- Données structurées JSON-LD (Google Knowledge Panel) -->
+    <!-- Données structurées JSON-LD (Google Knowledge Panel, ProfilePage, Person & WebSite) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "TCHAMIE Jephte",
-      "alternateName": ["Jephte TCHAMIE", "TCHAMIE JEPHTE", "Jefto"],
-      "jobTitle": "Développeur Web & UI/UX Designer",
-      "description": "Développeur Web Full-Stack et UI/UX Designer basé à Lomé, Togo. Spécialisé en React, Node.js, Java, Spring Boot et Figma.",
-      "url": "https://tchamie-jephte-portfolio.vercel.app",
-      "image": "https://tchamie-jephte-portfolio.vercel.app/img.png",
-      "email": "jefftchamie@gmail.com",
-      "telephone": "+228 91020171",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Lomé",
-        "addressCountry": "TG"
-      },
-      "sameAs": [
-        "https://github.com/jefto",
-        "https://www.linkedin.com/in/jefto2/",
-        "https://www.instagram.com/jefto2.0/",
-        "https://x.com/putamadre2_0"
-      ],
-      "knowsAbout": ["React", "Node.js", "Java", "Spring Boot", "Figma", "JavaScript", "Tailwind CSS", "PostgreSQL", "UI/UX Design"],
-      "alumniOf": {
-        "@type": "EducationalOrganization",
-        "name": "École Polytechnique de Lomé"
-      }
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "TCHAMIE Jephte Portfolio",
-      "url": "https://tchamie-jephte-portfolio.vercel.app",
-      "description": "Portfolio professionnel de TCHAMIE Jephte — Développeur Web & UI/UX Designer",
-      "author": {
-        "@type": "Person",
-        "name": "TCHAMIE Jephte"
-      }
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://tchamie-jephte-portfolio.vercel.app/#person",
+          "name": "TCHAMIE Jephte",
+          "alternateName": ["Bindounow Gnimdou Jephté TCHAMIE", "Jephte TCHAMIE", "Jefto"],
+          "jobTitle": "Ingénieur Génie Logiciel & Designer UI/UX",
+          "description": "Ingénieur Génie Logiciel Full-Stack et Designer UI/UX basé à Lomé, Togo. Spécialisé en architectures React, Node.js, Java, Spring Boot, PostgreSQL et conception de systèmes Figma.",
+          "url": "https://tchamie-jephte-portfolio.vercel.app",
+          "image": "https://tchamie-jephte-portfolio.vercel.app/img.png",
+          "email": "jefftchamie@gmail.com",
+          "telephone": "+228 91 02 01 71",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Lomé",
+            "addressRegion": "Maritime",
+            "addressCountry": "TG"
+          },
+          "sameAs": [
+            "https://github.com/jefto",
+            "https://www.linkedin.com/in/jefto2/",
+            "https://www.instagram.com/jefto2.0/",
+            "https://x.com/putamadre2_0"
+          ],
+          "knowsAbout": [
+            "Génie Logiciel",
+            "Développement Web Full-Stack",
+            "React.js",
+            "Node.js",
+            "Java",
+            "Spring Boot",
+            "PostgreSQL",
+            "Figma",
+            "UI/UX Design",
+            "Architecture API REST",
+            "Tailwind CSS"
+          ],
+          "alumniOf": {
+            "@type": "EducationalOrganization",
+            "name": "École Polytechnique de Lomé (EPL - Université de Lomé)",
+            "url": "https://epl.univ-lome.tg"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://tchamie-jephte-portfolio.vercel.app/#website",
+          "url": "https://tchamie-jephte-portfolio.vercel.app",
+          "name": "TCHAMIE Jephte — Portfolio",
+          "description": "Portfolio officiel de TCHAMIE Jephte, Ingénieur Logiciel & Designer UI/UX.",
+          "inLanguage": "fr-FR",
+          "publisher": {
+            "@id": "https://tchamie-jephte-portfolio.vercel.app/#person"
+          }
+        },
+        {
+          "@type": "ProfilePage",
+          "@id": "https://tchamie-jephte-portfolio.vercel.app/#profilepage",
+          "url": "https://tchamie-jephte-portfolio.vercel.app",
+          "name": "Profil professionnel de TCHAMIE Jephte",
+          "isPartOf": {
+            "@id": "https://tchamie-jephte-portfolio.vercel.app/#website"
+          },
+          "mainEntity": {
+            "@id": "https://tchamie-jephte-portfolio.vercel.app/#person"
+          }
+        }
+      ]
     }
     </script>
 
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/img.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Allan:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts avec pré-connexion optimisée -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Allan:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <!-- Rendu de secours sémantique pour les robots d'indexation sans JavaScript -->
     <noscript>
-      <h1>TCHAMIE Jephte — Développeur Web & UI/UX Designer</h1>
-      <p>Portfolio de TCHAMIE Jephte, développeur web full-stack et UI/UX designer basé à Lomé, Togo.
-         Spécialisé en React, Node.js, Java, Spring Boot et Figma.</p>
-      <p>Contact : jefftchamie@gmail.com | +228 91020171</p>
+      <header>
+        <h1>TCHAMIE Jephte — Ingénieur Génie Logiciel &amp; Designer UI/UX</h1>
+        <p>Lomé, Togo · Email : <a href="mailto:jefftchamie@gmail.com">jefftchamie@gmail.com</a> · Téléphone : +228 91 02 01 71</p>
+      </header>
+      <main>
+        <section>
+          <h2>Double Univers : Ingénierie Logicielle &amp; Design Studio</h2>
+          <p>Conception d'architectures web et mobiles full-stack (React, Node.js, Java, Spring Boot, PostgreSQL) et direction artistique de systèmes d'interfaces Figma et d'identités visuelles.</p>
+          <nav>
+            <ul>
+              <li><a href="/dev">Explorer l'Engineering &amp; Projets Développement (/dev)</a></li>
+              <li><a href="/design">Explorer le Studio de Création &amp; Maquettes UI/UX (/design)</a></li>
+              <li><a href="/contact">Démarrer un projet ou contacter (/contact)</a></li>
+              <li><a href="/about">À propos &amp; Méthodologie (/about)</a></li>
+              <li><a href="/skill">Parcours académique &amp; Compétences (/skill)</a></li>
+            </ul>
+          </nav>
+        </section>
+      </main>
     </noscript>
     <div id="root"></div>
   </body>

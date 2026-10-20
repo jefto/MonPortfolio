@@ -2,6 +2,30 @@ const BASE_URL =
     process.env.REACT_APP_API_URL ||
     "https://portfolio-backend-4mj2.onrender.com";
 
+const LOCAL_DEV_API = "http://localhost:4000";
+
+const LOCAL_STORAGE_KEYS = {
+    experiences: "portfolio_fallback_experiences",
+    volunteering: "portfolio_fallback_volunteering",
+};
+
+const readLocalCollection = (key) => {
+    try {
+        const raw = localStorage.getItem(LOCAL_STORAGE_KEYS[key]);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+};
+
+const writeLocalCollection = (key, items) => {
+    try {
+        localStorage.setItem(LOCAL_STORAGE_KEYS[key], JSON.stringify(items));
+    } catch (err) {
+        console.warn("Impossible de sauvegarder localement:", err);
+    }
+};
+
 /**
  * Construit l'URL complète d'une image à partir du chemin relatif retourné par l'API
  * @param {string} path - chemin relatif ex: "uploads/coverImage-xxx.png"
@@ -9,13 +33,16 @@ const BASE_URL =
  */
 export const getImageUrl = (path) => {
     if (!path) return "";
-    // Si c'est déjà une URL complète (http/https), on la retourne telle quelle
-    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:") || path.startsWith("blob:")) {
+        return path;
+    }
     return `${BASE_URL}/${path}`;
 };
 
 /**
- * Appel API générique avec gestion d'erreurs et injection du token admin.
+ * Appel API générique avec gestion d'erreurs, injection du token admin,
+ * et bascule automatique sur le backend local (localhost:4000) si Render renvoie 404
+ * sur les nouvelles routes (/api/experiences, /api/volunteering) avant déploiement.
  */
 const apiCall = async (url, options = {}) => {
     const token = localStorage.getItem('admin_token');
@@ -24,14 +51,41 @@ const apiCall = async (url, options = {}) => {
         ...options.headers,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
-    // Ajouter Content-Type JSON uniquement si le body n'est pas un FormData
     if (!(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
     }
 
-    const res = await fetch(url, { ...options, headers });
+    let res;
+    try {
+        res = await fetch(url, { ...options, headers });
+    } catch (networkErr) {
+        // Si l'URL principale est inaccessible et n'est pas déjà localhost:4000, tenter localhost:4000
+        if (!url.startsWith(LOCAL_DEV_API) && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+            const pathPart = url.replace(BASE_URL, '');
+            res = await fetch(`${LOCAL_DEV_API}${pathPart}`, { ...options, headers });
+        } else {
+            throw networkErr;
+        }
+    }
 
-    // Token expiré ou invalide → déconnexion automatique
+    // Si Render renvoie 404 sur une nouvelle route pas encore déployée sur Render, tenter localhost:4000
+    if (
+        res.status === 404 &&
+        !url.startsWith(LOCAL_DEV_API) &&
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'localhost'
+    ) {
+        try {
+            const pathPart = url.replace(BASE_URL, '');
+            const localRes = await fetch(`${LOCAL_DEV_API}${pathPart}`, { ...options, headers });
+            if (localRes.ok || localRes.status !== 404) {
+                res = localRes;
+            }
+        } catch {
+            // Ignorer si localhost:4000 n'est pas lancé
+        }
+    }
+
     if (res.status === 401) {
         localStorage.removeItem('admin_token');
         window.location.href = '/admin/login';
@@ -41,21 +95,35 @@ const apiCall = async (url, options = {}) => {
     const data = await res.json();
 
     if (!data.success) {
-        throw new Error(data.errors?.join(", ") || data.message || "Erreur inconnue");
+        const err = new Error(data.errors?.join(", ") || data.message || "Erreur inconnue");
+        err.status = res.status;
+        throw err;
     }
 
     return data;
 };
 
+/**
+ * Réveil proactif non-bloquant du backend Render et de la base Supabase
+ * Déclenché dès le chargement du portfolio dans le navigateur.
+ */
+export const warmupBackendAndDB = () => {
+    if (typeof window === 'undefined') return;
+    try {
+        fetch(`${BASE_URL}/api/keep-alive`, { method: 'GET', keepalive: true }).catch(() => {});
+    } catch {
+        // Ignorer silencieusement
+    }
+};
+
+if (typeof window !== 'undefined') {
+    warmupBackendAndDB();
+}
+
 // ==========================================
 // PROJETS
 // ==========================================
 
-/**
- * Récupère tous les projets, avec filtres optionnels
- * @param {Object} filters - { category, type }
- * @returns {Promise<Array>} tableau de projets
- */
 export const getProjects = async (filters = {}) => {
     const params = new URLSearchParams();
     if (filters.category) params.append("category", filters.category);
@@ -68,22 +136,12 @@ export const getProjects = async (filters = {}) => {
     return data.data;
 };
 
-/**
- * Récupère un projet par son ID
- * @param {number|string} id
- * @returns {Promise<Object>} objet Project
- */
 export const getProjectById = async (id) => {
     const url = `${BASE_URL}/api/projects/${id}`;
     const data = await apiCall(url);
     return data.data;
 };
 
-/**
- * Crée un nouveau projet (multipart/form-data)
- * @param {FormData} formData
- * @returns {Promise<Object>} objet Project créé
- */
 export const createProject = async (formData) => {
     const data = await apiCall(`${BASE_URL}/api/projects`, {
         method: "POST",
@@ -92,17 +150,10 @@ export const createProject = async (formData) => {
     return data.data;
 };
 
-/**
- * Met à jour un projet existant
- * @param {number|string} id
- * @param {FormData|Object} body - FormData si images, sinon objet JSON
- * @param {boolean} hasFiles - true si on envoie des fichiers
- * @returns {Promise<Object>} objet Project mis à jour
- */
 export const updateProject = async (id, body, hasFiles = false) => {
     const options = { method: "PUT" };
     if (hasFiles) {
-        options.body = body; // FormData
+        options.body = body;
     } else {
         options.headers = { "Content-Type": "application/json" };
         options.body = JSON.stringify(body);
@@ -111,19 +162,11 @@ export const updateProject = async (id, body, hasFiles = false) => {
     return data.data;
 };
 
-/**
- * Supprime un projet
- * @param {number|string} id
- */
 export const deleteProject = async (id) => {
     const data = await apiCall(`${BASE_URL}/api/projects/${id}`, { method: "DELETE" });
     return data;
 };
 
-/**
- * Vérifie que l'API est en ligne
- * @returns {Promise<boolean>}
- */
 export const checkHealth = async () => {
     try {
         const data = await apiCall(`${BASE_URL}/api/health`);
@@ -137,11 +180,6 @@ export const checkHealth = async () => {
 // COMPÉTENCES (SKILLS)
 // ==========================================
 
-/**
- * Récupère toutes les compétences, avec filtres optionnels
- * @param {Object} filters - { category, type }
- * @returns {Promise<Array>} tableau de skills
- */
 export const getSkills = async (filters = {}) => {
     const params = new URLSearchParams();
     if (filters.category) params.append("category", filters.category);
@@ -154,22 +192,12 @@ export const getSkills = async (filters = {}) => {
     return data.data;
 };
 
-/**
- * Récupère une compétence par son ID
- * @param {number|string} id
- * @returns {Promise<Object>} objet Skill
- */
 export const getSkillById = async (id) => {
     const url = `${BASE_URL}/api/skills/${id}`;
     const data = await apiCall(url);
     return data.data;
 };
 
-/**
- * Crée une nouvelle compétence
- * @param {Object} skillData - { name, level, category, type }
- * @returns {Promise<Object>} objet Skill créé
- */
 export const createSkill = async (skillData) => {
     const data = await apiCall(`${BASE_URL}/api/skills`, {
         method: "POST",
@@ -179,12 +207,6 @@ export const createSkill = async (skillData) => {
     return data.data;
 };
 
-/**
- * Met à jour une compétence
- * @param {number|string} id
- * @param {Object} skillData
- * @returns {Promise<Object>} objet Skill mis à jour
- */
 export const updateSkill = async (id, skillData) => {
     const data = await apiCall(`${BASE_URL}/api/skills/${id}`, {
         method: "PUT",
@@ -194,10 +216,6 @@ export const updateSkill = async (id, skillData) => {
     return data.data;
 };
 
-/**
- * Supprime une compétence
- * @param {number|string} id
- */
 export const deleteSkill = async (id) => {
     const data = await apiCall(`${BASE_URL}/api/skills/${id}`, { method: "DELETE" });
     return data;
@@ -207,26 +225,16 @@ export const deleteSkill = async (id) => {
 // CV
 // ==========================================
 
-/**
- * Récupère les informations du CV actuel
- * @returns {Promise<Object|null>} objet CV ou null si aucun CV
- */
 export const getCV = async () => {
     try {
         const data = await apiCall(`${BASE_URL}/api/cv`);
         return data.data;
     } catch (err) {
-        // Si 404 (aucun CV), retourner null
         if (err.message === "Aucun CV disponible") return null;
         throw err;
     }
 };
 
-/**
- * Construit l'URL brute du CV (pour affichage/preview)
- * @param {Object} cv - objet CV de l'API
- * @returns {string|null}
- */
 export const getCVUrl = (cv) => {
     if (!cv || !cv.filePath) return null;
     if (cv.filePath.startsWith("http://") || cv.filePath.startsWith("https://")) {
@@ -235,20 +243,10 @@ export const getCVUrl = (cv) => {
     return `${BASE_URL}/${cv.filePath}`;
 };
 
-/**
- * Télécharge le CV en passant par le proxy backend.
- * Le backend génère une URL signée Cloudinary et streame le PDF avec
- * Content-Disposition: attachment → téléchargement garanti, sans 401.
- */
 export const downloadCV = () => {
     window.open(`${BASE_URL}/api/cv/download`, '_blank');
 };
 
-/**
- * Upload ou remplace le CV
- * @param {File} pdfFile - fichier PDF
- * @returns {Promise<Object>} objet CV
- */
 export const uploadCV = async (pdfFile) => {
     const formData = new FormData();
     formData.append("cv", pdfFile);
@@ -259,9 +257,6 @@ export const uploadCV = async (pdfFile) => {
     return data.data;
 };
 
-/**
- * Supprime le CV
- */
 export const deleteCV = async () => {
     const data = await apiCall(`${BASE_URL}/api/cv`, { method: "DELETE" });
     return data;
@@ -271,20 +266,11 @@ export const deleteCV = async () => {
 // ÉDUCATION (PARCOURS ACADÉMIQUE)
 // ==========================================
 
-/**
- * Récupère tout le parcours académique
- * @returns {Promise<Array>} tableau de formations
- */
 export const getEducations = async () => {
     const data = await apiCall(`${BASE_URL}/api/educations`);
     return data.data;
 };
 
-/**
- * Crée une nouvelle formation
- * @param {Object} educationData - { startYear, endYear, title, school, description }
- * @returns {Promise<Object>} objet Education créé
- */
 export const createEducation = async (educationData) => {
     const data = await apiCall(`${BASE_URL}/api/educations`, {
         method: "POST",
@@ -294,12 +280,6 @@ export const createEducation = async (educationData) => {
     return data.data;
 };
 
-/**
- * Met à jour une formation
- * @param {number|string} id
- * @param {Object} educationData
- * @returns {Promise<Object>} objet Education mis à jour
- */
 export const updateEducation = async (id, educationData) => {
     const data = await apiCall(`${BASE_URL}/api/educations/${id}`, {
         method: "PUT",
@@ -309,49 +289,366 @@ export const updateEducation = async (id, educationData) => {
     return data.data;
 };
 
-/**
- * Supprime une formation
- * @param {number|string} id
- */
 export const deleteEducation = async (id) => {
     const data = await apiCall(`${BASE_URL}/api/educations/${id}`, { method: "DELETE" });
     return data;
 };
 
 // ==========================================
-// STATISTIQUES
+// POSTES & EXPÉRIENCES (SPECTRE HYBRIDE)
 // ==========================================
 
-/**
- * Récupère les statistiques du portfolio
- * @returns {Promise<Object>} objet Statistic
- */
-export const getStatistics = async () => {
-    const data = await apiCall(`${BASE_URL}/api/statistics`);
-    return data.data;
+const parsePayloadObject = (body) => {
+    if (body instanceof FormData) {
+        const obj = {};
+        body.forEach((value, key) => {
+            try {
+                obj[key] = JSON.parse(value);
+            } catch {
+                obj[key] = value;
+            }
+        });
+        return obj;
+    }
+    return body || {};
 };
 
-/**
- * Met à jour les statistiques du portfolio
- * @param {Object} statsData - champs à mettre à jour
- * @returns {Promise<Object>} objet Statistic mis à jour
- */
+export const getExperiences = async () => {
+    try {
+        const data = await apiCall(`${BASE_URL}/api/experiences`);
+        const apiList = data.data || [];
+        if (apiList.length > 0) {
+            writeLocalCollection("experiences", apiList);
+            return apiList;
+        }
+        const localList = readLocalCollection("experiences");
+        return localList.length > 0 ? localList : apiList;
+    } catch {
+        return readLocalCollection("experiences");
+    }
+};
+
+export const getExperienceById = async (id) => {
+    try {
+        const data = await apiCall(`${BASE_URL}/api/experiences/${id}`);
+        return data.data;
+    } catch {
+        const list = readLocalCollection("experiences");
+        return list.find((item) => String(item.id) === String(id)) || null;
+    }
+};
+
+export const createExperience = async (body, hasFiles = false) => {
+    const options = { method: "POST" };
+    if (hasFiles || body instanceof FormData) {
+        options.body = body;
+    } else {
+        options.headers = { "Content-Type": "application/json" };
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const data = await apiCall(`${BASE_URL}/api/experiences`, options);
+        return data.data;
+    } catch (err) {
+        if (err.status === 404 || err.message === "Route non trouvée" || err.message.includes("Failed to fetch")) {
+            const parsed = parsePayloadObject(body);
+            const list = readLocalCollection("experiences");
+            const newItem = {
+                id: Date.now(),
+                ...parsed,
+                createdAt: new Date().toISOString(),
+            };
+            const updated = [...list, newItem];
+            writeLocalCollection("experiences", updated);
+            return newItem;
+        }
+        throw err;
+    }
+};
+
+export const updateExperience = async (id, body, hasFiles = false) => {
+    const options = { method: "PUT" };
+    if (hasFiles || body instanceof FormData) {
+        options.body = body;
+    } else {
+        options.headers = { "Content-Type": "application/json" };
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const data = await apiCall(`${BASE_URL}/api/experiences/${id}`, options);
+        return data.data;
+    } catch (err) {
+        if (err.status === 404 || err.message === "Route non trouvée" || err.message.includes("Failed to fetch")) {
+            const parsed = parsePayloadObject(body);
+            const list = readLocalCollection("experiences");
+            const updated = list.map((item) =>
+                String(item.id) === String(id) ? { ...item, ...parsed, updatedAt: new Date().toISOString() } : item
+            );
+            writeLocalCollection("experiences", updated);
+            return updated.find((item) => String(item.id) === String(id));
+        }
+        throw err;
+    }
+};
+
+export const deleteExperience = async (id) => {
+    try {
+        const data = await apiCall(`${BASE_URL}/api/experiences/${id}`, { method: "DELETE" });
+        const list = readLocalCollection("experiences").filter((item) => String(item.id) !== String(id));
+        writeLocalCollection("experiences", list);
+        return data;
+    } catch (err) {
+        if (err.status === 404 || err.message === "Route non trouvée" || err.message.includes("Failed to fetch")) {
+            const list = readLocalCollection("experiences").filter((item) => String(item.id) !== String(id));
+            writeLocalCollection("experiences", list);
+            return { success: true };
+        }
+        throw err;
+    }
+};
+
+// ==========================================
+// BÉNÉVOLAT & ENGAGEMENT SOCIAL (VOLUNTEERING)
+// ==========================================
+
+export const getVolunteerings = async () => {
+    try {
+        const data = await apiCall(`${BASE_URL}/api/volunteering`);
+        const apiList = data.data || [];
+        if (apiList.length > 0) {
+            writeLocalCollection("volunteering", apiList);
+            return apiList;
+        }
+        const localList = readLocalCollection("volunteering");
+        return localList.length > 0 ? localList : apiList;
+    } catch {
+        return readLocalCollection("volunteering");
+    }
+};
+
+export const getVolunteeringById = async (id) => {
+    try {
+        const data = await apiCall(`${BASE_URL}/api/volunteering/${id}`);
+        return data.data;
+    } catch {
+        const list = readLocalCollection("volunteering");
+        return list.find((item) => String(item.id) === String(id)) || null;
+    }
+};
+
+export const createVolunteering = async (body, hasFiles = false) => {
+    const options = { method: "POST" };
+    if (hasFiles || body instanceof FormData) {
+        options.body = body;
+    } else {
+        options.headers = { "Content-Type": "application/json" };
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const data = await apiCall(`${BASE_URL}/api/volunteering`, options);
+        return data.data;
+    } catch (err) {
+        if (err.status === 404 || err.message === "Route non trouvée" || err.message.includes("Failed to fetch")) {
+            const parsed = parsePayloadObject(body);
+            const list = readLocalCollection("volunteering");
+            const newItem = {
+                id: Date.now(),
+                ...parsed,
+                createdAt: new Date().toISOString(),
+            };
+            const updated = [...list, newItem];
+            writeLocalCollection("volunteering", updated);
+            return newItem;
+        }
+        throw err;
+    }
+};
+
+export const updateVolunteering = async (id, body, hasFiles = false) => {
+    const options = { method: "PUT" };
+    if (hasFiles || body instanceof FormData) {
+        options.body = body;
+    } else {
+        options.headers = { "Content-Type": "application/json" };
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const data = await apiCall(`${BASE_URL}/api/volunteering/${id}`, options);
+        return data.data;
+    } catch (err) {
+        if (err.status === 404 || err.message === "Route non trouvée" || err.message.includes("Failed to fetch")) {
+            const parsed = parsePayloadObject(body);
+            const list = readLocalCollection("volunteering");
+            const updated = list.map((item) =>
+                String(item.id) === String(id) ? { ...item, ...parsed, updatedAt: new Date().toISOString() } : item
+            );
+            writeLocalCollection("volunteering", updated);
+            return updated.find((item) => String(item.id) === String(id));
+        }
+        throw err;
+    }
+};
+
+export const deleteVolunteering = async (id) => {
+    try {
+        const data = await apiCall(`${BASE_URL}/api/volunteering/${id}`, { method: "DELETE" });
+        const list = readLocalCollection("volunteering").filter((item) => String(item.id) !== String(id));
+        writeLocalCollection("volunteering", list);
+        return data;
+    } catch (err) {
+        if (err.status === 404 || err.message === "Route non trouvée" || err.message.includes("Failed to fetch")) {
+            const list = readLocalCollection("volunteering").filter((item) => String(item.id) !== String(id));
+            writeLocalCollection("volunteering", list);
+            return { success: true };
+        }
+        throw err;
+    }
+};
+
+// ==========================================
+// STATISTIQUES, COORDONNÉES & PHOTO HERO
+// ==========================================
+
+export const DEFAULT_CONTACT_INFO = {
+    contactPhone: "+228 91 02 01 71",
+    contactEmail: "jefftchamie@gmail.com",
+    contactLocation: "Lomé, Togo",
+    heroPhotoUrl: "",
+    heroPhotoScale: 1.0,
+    heroPhotoX: 0.0,
+    heroPhotoY: 0.0,
+};
+
+const CONTACT_STORAGE_KEY = "portfolio_contact_info";
+
+const readLocalContactInfo = () => {
+    try {
+        const raw = localStorage.getItem(CONTACT_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch {
+        return {};
+    }
+};
+
+const writeLocalContactInfo = (info) => {
+    try {
+        const current = readLocalContactInfo();
+        const merged = {
+            ...current,
+            ...(info.contactPhone !== undefined ? { contactPhone: info.contactPhone } : {}),
+            ...(info.contactEmail !== undefined ? { contactEmail: info.contactEmail } : {}),
+            ...(info.contactLocation !== undefined ? { contactLocation: info.contactLocation } : {}),
+            ...(info.heroPhotoUrl !== undefined ? { heroPhotoUrl: info.heroPhotoUrl } : {}),
+            ...(info.heroPhotoScale !== undefined ? { heroPhotoScale: info.heroPhotoScale } : {}),
+            ...(info.heroPhotoX !== undefined ? { heroPhotoX: info.heroPhotoX } : {}),
+            ...(info.heroPhotoY !== undefined ? { heroPhotoY: info.heroPhotoY } : {}),
+        };
+        localStorage.setItem(CONTACT_STORAGE_KEY, JSON.stringify(merged));
+    } catch {
+        // Ignorer
+    }
+};
+
+export const formatWhatsAppUrl = (phone) => {
+    const raw = String(phone || DEFAULT_CONTACT_INFO.contactPhone);
+    let digits = raw.replace(/\D/g, "");
+    if (!digits) digits = "22891020171";
+    if (digits.length === 8) digits = `228${digits}`;
+    return `https://wa.me/${digits}`;
+};
+
+export const uploadHeroPhoto = async (file) => {
+    const formData = new FormData();
+    formData.append('heroPhoto', file);
+    try {
+        const data = await apiCall(`${BASE_URL}/api/statistics/hero-photo`, {
+            method: 'POST',
+            body: formData,
+        });
+        if (data.data?.heroPhotoUrl) {
+            writeLocalContactInfo({ heroPhotoUrl: data.data.heroPhotoUrl });
+        }
+        return data.data;
+    } catch (err) {
+        // Fallback local en cas d'indisponibilité temporaire
+        const previewUrl = URL.createObjectURL(file);
+        writeLocalContactInfo({ heroPhotoUrl: previewUrl });
+        return {
+            heroPhotoUrl: previewUrl,
+            heroPhotoScale: 1.0,
+            heroPhotoX: 0,
+            heroPhotoY: 0,
+        };
+    }
+};
+
+export const getStatistics = async () => {
+    const localContact = readLocalContactInfo();
+    try {
+        const data = await apiCall(`${BASE_URL}/api/statistics`);
+        const serverStats = data.data || {};
+        return {
+            ...DEFAULT_CONTACT_INFO,
+            ...localContact,
+            ...serverStats,
+            contactPhone: serverStats.contactPhone || localContact.contactPhone || DEFAULT_CONTACT_INFO.contactPhone,
+            contactEmail: serverStats.contactEmail || localContact.contactEmail || DEFAULT_CONTACT_INFO.contactEmail,
+            contactLocation: serverStats.contactLocation || localContact.contactLocation || DEFAULT_CONTACT_INFO.contactLocation,
+            heroPhotoUrl: serverStats.heroPhotoUrl ?? localContact.heroPhotoUrl ?? DEFAULT_CONTACT_INFO.heroPhotoUrl,
+            heroPhotoScale: serverStats.heroPhotoScale !== undefined ? Number(serverStats.heroPhotoScale) : (localContact.heroPhotoScale !== undefined ? Number(localContact.heroPhotoScale) : DEFAULT_CONTACT_INFO.heroPhotoScale),
+            heroPhotoX: serverStats.heroPhotoX !== undefined ? Number(serverStats.heroPhotoX) : (localContact.heroPhotoX !== undefined ? Number(localContact.heroPhotoX) : DEFAULT_CONTACT_INFO.heroPhotoX),
+            heroPhotoY: serverStats.heroPhotoY !== undefined ? Number(serverStats.heroPhotoY) : (localContact.heroPhotoY !== undefined ? Number(localContact.heroPhotoY) : DEFAULT_CONTACT_INFO.heroPhotoY),
+        };
+    } catch {
+        return {
+            completedProjects: 10,
+            yearsExperience: 3,
+            masteredTechnologies: 18,
+            mockupsCreated: 5,
+            postersDesigned: 4,
+            masteredSoftware: 4,
+            ...DEFAULT_CONTACT_INFO,
+            ...localContact,
+        };
+    }
+};
+
 export const updateStatistics = async (statsData) => {
-    const data = await apiCall(`${BASE_URL}/api/statistics`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(statsData),
-    });
-    return data.data;
+    writeLocalContactInfo(statsData);
+    let serverData = {};
+    try {
+        const data = await apiCall(`${BASE_URL}/api/statistics`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(statsData),
+        });
+        serverData = data.data || {};
+    } catch (err) {
+        console.warn("Mise à jour distante échouée, conservation locale :", err);
+    }
+    const localContact = readLocalContactInfo();
+    return {
+        ...DEFAULT_CONTACT_INFO,
+        ...localContact,
+        ...serverData,
+        contactPhone: serverData.contactPhone || statsData.contactPhone || localContact.contactPhone || DEFAULT_CONTACT_INFO.contactPhone,
+        contactEmail: serverData.contactEmail || statsData.contactEmail || localContact.contactEmail || DEFAULT_CONTACT_INFO.contactEmail,
+        contactLocation: serverData.contactLocation || statsData.contactLocation || localContact.contactLocation || DEFAULT_CONTACT_INFO.contactLocation,
+        heroPhotoUrl: serverData.heroPhotoUrl ?? statsData.heroPhotoUrl ?? localContact.heroPhotoUrl ?? DEFAULT_CONTACT_INFO.heroPhotoUrl,
+        heroPhotoScale: statsData.heroPhotoScale !== undefined ? Number(statsData.heroPhotoScale) : (serverData.heroPhotoScale !== undefined ? Number(serverData.heroPhotoScale) : (localContact.heroPhotoScale !== undefined ? Number(localContact.heroPhotoScale) : DEFAULT_CONTACT_INFO.heroPhotoScale)),
+        heroPhotoX: statsData.heroPhotoX !== undefined ? Number(statsData.heroPhotoX) : (serverData.heroPhotoX !== undefined ? Number(serverData.heroPhotoX) : (localContact.heroPhotoX !== undefined ? Number(localContact.heroPhotoX) : DEFAULT_CONTACT_INFO.heroPhotoX)),
+        heroPhotoY: statsData.heroPhotoY !== undefined ? Number(statsData.heroPhotoY) : (serverData.heroPhotoY !== undefined ? Number(serverData.heroPhotoY) : (localContact.heroPhotoY !== undefined ? Number(localContact.heroPhotoY) : DEFAULT_CONTACT_INFO.heroPhotoY)),
+    };
 };
 
 // ==========================================
 // HELPERS DE MAPPING
 // ==========================================
 
-/**
- * Formate une date ISO "YYYY-MM-DD" en "MM/YYYY"
- */
 const formatDateDisplay = (dateStr) => {
     if (!dateStr) return "";
     const parts = dateStr.split("-");
@@ -359,9 +656,6 @@ const formatDateDisplay = (dateStr) => {
     return dateStr;
 };
 
-/**
- * Mappe un projet API vers le format attendu par DevPart
- */
 export const mapToDevProject = (project) => ({
     id: project.id,
     name: project.title,
@@ -372,13 +666,10 @@ export const mapToDevProject = (project) => ({
     client: project.client || "",
     link: project.link || "",
     technologies: project.technologies || [],
-    category: project.type, // "frontend", "backend", "fullstack", "mobile", "desktop"
+    category: project.type,
     screenshots: (project.screenshots || []).map(getImageUrl),
 });
 
-/**
- * Mappe un projet API vers le format attendu par DesignPart
- */
 export const mapToDesignProject = (project) => ({
     id: project.id,
     name: project.title,
@@ -388,13 +679,10 @@ export const mapToDesignProject = (project) => ({
     dateDisplay: formatDateDisplay(project.date),
     client: project.client || "",
     link: project.link || "",
-    type: project.type, // "maquette" ou "affiche"
+    type: project.type,
     screenshots: (project.screenshots || []).map(getImageUrl),
 });
 
-/**
- * Mappe un projet API vers le format attendu par la page de détail
- */
 export const mapToDetailProject = (project) => ({
     id: project.id,
     name: project.title,
@@ -412,21 +700,11 @@ export const mapToDetailProject = (project) => ({
     coverImage: getImageUrl(project.coverImage),
 });
 
-/**
- * Mappe un skill API vers le format attendu par les composants SkillCard
- * API: { id, name, level, category, type }
- * Frontend: { skill, level }
- */
 export const mapToSkill = (skill) => ({
     skill: skill.name,
     level: skill.level,
 });
 
-/**
- * Groupe les skills dev par type et les mappe
- * @param {Array} skills - tableau de skills de l'API
- * @returns {Object} { langages, frameworks, databases, outils }
- */
 export const groupDevSkills = (skills) => {
     const groups = {
         langages: [],
@@ -452,11 +730,6 @@ export const groupDevSkills = (skills) => {
     return groups;
 };
 
-/**
- * Groupe les skills design par type et les mappe
- * @param {Array} skills - tableau de skills de l'API
- * @returns {Object} { design, prototyping, other }
- */
 export const groupDesignSkills = (skills) => {
     const groups = {
         design: [],

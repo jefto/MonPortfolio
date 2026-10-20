@@ -8,4 +8,4 @@ export { default as FormInput } from './FormInput';
 export { default as MatrixRain } from './MatrixRain';
 export { default as TerminalText } from './TerminalText';
 export { default as TerminalWindow } from './TerminalWindow';
-
+export { default as HeroFramedPhoto } from './HeroFramedPhoto';

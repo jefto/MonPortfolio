@@ -2,32 +2,31 @@ import { useState, useEffect } from 'react';
 import { getEducations } from '../../services/api';
 import SEO from '../../components/SEO';
 
-// Données statiques de fallback (utilisées si l'API échoue)
 const fallbackData = [
     {
-        annee: "2023 - Actuellement",
+        annee: "2023 — Actuellement",
         diplome: "Licence Professionnelle Génie Logiciel",
         etablissement: "École Polytechnique de Lomé",
-        description: "Formation en architecture et développement de logiciel"
+        description: "Ingénierie logicielle, conception orientée objet, bases de données relationnelles et architectures distribuées."
     },
     {
-        annee: "2020 - 2023",
-        diplome: "Lycée",
+        annee: "2020 — 2023",
+        diplome: "Baccalauréat Scientifique (Série D)",
         etablissement: "C.S. La Promotion",
-        description: "Parcours Mathématique et Biologie. Mention Très Bien"
+        description: "Cursus Mathématiques et Sciences Physiques / Biologie. Mention Très Bien."
     },
     {
-        annee: "2016 - 2020",
-        diplome: "Collège",
+        annee: "2016 — 2020",
+        diplome: "Brevet d'Études du Premier Cycle",
         etablissement: "C.S. La Promotion",
-        description: "Parcours Général. Mention Bien"
+        description: "Formation générale scientifique et littéraire. Mention Bien."
     }
 ];
 
 const formatEducation = (edu) => ({
     annee: edu.endYear === null
-        ? `${edu.startYear} - Actuellement`
-        : `${edu.startYear} - ${edu.endYear}`,
+        ? `${edu.startYear} — Actuellement`
+        : `${edu.startYear} — ${edu.endYear}`,
     diplome: edu.title,
     etablissement: edu.school,
     description: edu.description || '',
@@ -46,7 +45,6 @@ export default function Study() {
                 }
             } catch (err) {
                 console.error("Erreur chargement parcours:", err);
-                // Garder les données de fallback
             } finally {
                 setLoading(false);
             }
@@ -55,57 +53,86 @@ export default function Study() {
     }, []);
 
     return (
-        <section className="px-8 md:px-16 py-16">
+        <section className="relative px-4 sm:px-8 md:px-16 py-20 bg-[#FAF8F5] border-b border-zinc-200 overflow-hidden">
             <SEO
-                title="Parcours Académique — TCHAMIE Jephte"
-                description="Parcours académique de TCHAMIE Jephte : École Polytechnique de Lomé, formation en génie logiciel et développement web."
+                title="Formation Académique — TCHAMIE Jephte"
+                description="Parcours académique de TCHAMIE Jephte : École Polytechnique de Lomé, Licence Professionnelle en Génie Logiciel."
                 path="/skill"
             />
-            <div className="max-w-7xl mx-auto">
-                <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center font-abril">
-                    Parcours <span className="text-blue-500">Académique</span>
-                </h2>
+            {/* Figures géométriques en arrière-plan */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                <svg
+                    className="absolute -right-12 bottom-[-15%] w-[420px] h-[420px] text-blue-600/20"
+                    viewBox="0 0 400 400"
+                    fill="none"
+                >
+                    <circle cx="200" cy="200" r="170" stroke="currentColor" strokeWidth="1.6" strokeDasharray="6 6" />
+                    <circle cx="200" cy="200" r="115" stroke="currentColor" strokeWidth="1.5" />
+                    <rect x="85" y="85" width="230" height="230" stroke="currentColor" strokeWidth="1.4" transform="rotate(30 200 200)" />
+                </svg>
+                <svg
+                    className="absolute left-8 top-8 w-52 h-52 text-zinc-900/15"
+                    viewBox="0 0 200 200"
+                    fill="none"
+                >
+                    <path d="M 0 40 L 200 40 M 40 0 L 40 200" stroke="currentColor" strokeWidth="1.5" />
+                    <circle cx="40" cy="40" r="28" stroke="currentColor" strokeWidth="1.5" />
+                    <circle cx="40" cy="40" r="55" stroke="#d97706" strokeOpacity="0.4" strokeWidth="1.4" strokeDasharray="4 4" />
+                </svg>
+            </div>
+
+            <div className="max-w-7xl mx-auto relative z-10">
+                <div className="mb-12 pb-6 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div>
+                        <span className="font-mono text-xs uppercase tracking-[0.2em] text-blue-600 block mb-2">
+                            04 // CURSUS ACADÉMIQUE
+                        </span>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-zinc-950 font-abril tracking-tight">
+                            Formation &amp; Diplômes
+                        </h2>
+                    </div>
+                    <span className="font-mono text-xs text-zinc-500">
+                        ÉCOLE POLYTECHNIQUE DE LOMÉ (EPL)
+                    </span>
+                </div>
 
                 {loading ? (
-                    <div className="text-center py-16">
-                        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3" />
-                        <p className="text-gray-500 text-sm">Chargement du parcours...</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[1, 2, 3].map((n) => (
+                            <div key={n} className="h-44 bg-zinc-200/60 rounded-xl animate-pulse" />
+                        ))}
                     </div>
                 ) : (
-                <div className="relative font-poppins">
-                    {/* Ligne verticale */}
-                    <div className="absolute left-4  md:left-1/2 top-0 bottom-0 w-0.5 bg-blue-500" />
-
-                    {parcoursData.map((item, index) => (
-                        <div
-                            key={index}
-                            className={`relative flex flex-col md:flex-row gap-8 mb-12 ${
-                                index % 2 === 0 ? 'md:flex-row-reverse' : ''
-                            }`}
-                        >
-                            {/* Point sur la timeline */}
-                            <div className="absolute left-4 md:left-1/2 w-4 h-4 bg-blue-500 rounded-full transform -translate-x-1/2 border-4 border-white shadow-md shadow-blue-500/50" />
-
-                            {/* Contenu */}
-                            <div className={`ml-12 md:ml-0 md:w-1/2 ${index % 2 === 0 ? 'md:pr-16' : 'md:pl-16'}`}>
-                                <div className="bg-white rounded-xl p-6 m-10 shadow-lg shadow-blue-500/20 border border-gray-100 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300">
-                                    <span className="inline-block px-3 py-1 bg-blue-500 text-white text-sm font-semibold rounded-full mb-3">
-                                        {item.annee}
-                                    </span>
-                                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-poppins">
+                        {parcoursData.map((item, index) => (
+                            <div
+                                key={index}
+                                className="bg-white rounded-xl p-6 border border-zinc-200 hover:border-zinc-900 transition-colors flex flex-col justify-between"
+                            >
+                                <div>
+                                    <div className="flex items-center justify-between gap-2 mb-4">
+                                        <span className="inline-block px-3 py-1 bg-zinc-950 text-white text-xs font-mono rounded">
+                                            {item.annee}
+                                        </span>
+                                        <span className="font-mono text-xs text-zinc-400">
+                                            0{index + 1}
+                                        </span>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-zinc-950 mb-1.5">
                                         {item.diplome}
                                     </h3>
-                                    <p className="text-blue-600 font-semibold mb-2">
+                                    <p className="text-blue-600 font-medium text-sm mb-3">
                                         {item.etablissement}
                                     </p>
-                                    <p className="text-gray-600">
+                                </div>
+                                {item.description && (
+                                    <p className="text-zinc-600 text-sm leading-relaxed pt-3 border-t border-zinc-100">
                                         {item.description}
                                     </p>
-                                </div>
+                                )}
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
                 )}
             </div>
         </section>

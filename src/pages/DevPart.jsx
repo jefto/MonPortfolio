@@ -12,8 +12,17 @@ import {
     FormInput,
     AnimatedButton
 } from '../components/ui';
-import { getProjects, mapToDevProject, getSkills, groupDevSkills, getStatistics } from '../services/api';
+import {
+    getProjects,
+    mapToDevProject,
+    getSkills,
+    groupDevSkills,
+    getStatistics,
+    formatWhatsAppUrl,
+    DEFAULT_CONTACT_INFO,
+} from '../services/api';
 import SEO from '../components/SEO';
+import Navbar from '../components/Navbar';
 
 // ============================================
 // DONNÉES - Modifier ici pour personnaliser
@@ -55,14 +64,7 @@ const projectCategories = [
 
 // Les projets sont maintenant chargés depuis l'API backend
 
-// Les statistiques sont maintenant chargées depuis l'API backend
-
-// Informations de contact
-const contactInfo = {
-    email: "jefftchamie@gmail.com",
-    location: "Lomé, TOGO",
-    phone: "+228 91020171"
-};
+// Les statistiques et coordonnées sont maintenant chargées depuis l'API backend
 
 // Réseaux sociaux
 const socialLinks = [
@@ -146,6 +148,12 @@ export default function DevPart() {
         fetchSkills();
     }, []);
 
+    const [contactInfo, setContactInfo] = useState({
+        email: DEFAULT_CONTACT_INFO.contactEmail,
+        location: DEFAULT_CONTACT_INFO.contactLocation,
+        phone: DEFAULT_CONTACT_INFO.contactPhone,
+    });
+
     // Charger les statistiques depuis l'API
     useEffect(() => {
         const fetchStats = async () => {
@@ -158,6 +166,11 @@ export default function DevPart() {
                         { label: "Technologies maîtrisées", value: `${data.masteredTechnologies}+` },
                         { label: "Cafés consommés", value: "∞" }
                     ]);
+                    setContactInfo({
+                        email: data.contactEmail || DEFAULT_CONTACT_INFO.contactEmail,
+                        location: data.contactLocation || DEFAULT_CONTACT_INFO.contactLocation,
+                        phone: data.contactPhone || DEFAULT_CONTACT_INFO.contactPhone,
+                    });
                 }
             } catch (err) {
                 console.error("Erreur chargement statistiques:", err);
@@ -254,12 +267,13 @@ export default function DevPart() {
     );
 
     return (
-        <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
+        <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-x-hidden">
             <SEO
                 title="Projets Développement — TCHAMIE Jephte"
-                description="Découvrez les projets de développement web de TCHAMIE Jephte : React, Node.js, Java, Spring Boot, applications fullstack, frontend et backend."
+                description="Projets d'ingénierie logicielle de TCHAMIE Jephte : React, Node.js, Java, Spring Boot, applications fullstack, frontend et backend."
                 path="/dev"
             />
+            <Navbar variant="dark" />
             <MatrixRain />
 
             {/* Grille de fond */}
@@ -289,14 +303,14 @@ export default function DevPart() {
                 <header className={`mb-10 md:mb-16 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
                     <div className="flex items-center gap-4 mb-4">
                         <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-lg shadow-green-500/50" />
-                        <span className="text-green-500/70 text-sm">SYSTEM ONLINE</span>
+                        <span className="text-green-500/70 text-sm">SYSTEM ONLINE // ARCHITECTURE &amp; CODE</span>
                     </div>
                     <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-green-400 mb-4 drop-shadow-[0_0_10px_rgba(0,255,0,0.5)]">
-                        <TerminalText text="DÉVELOPPEUR WEB" delay={80} />
+                        <TerminalText text="INGÉNIERIE LOGICIELLE" delay={80} />
                     </h1>
                     <p className="text-green-500/80 text-base sm:text-lg md:text-xl max-w-2xl">
                         <span className="text-green-600">{`// `}</span>
-                        Passionné par le code, créateur de solutions numériques
+                        Architecture Full-Stack, API distribuées et systèmes web en production
                     </p>
                 </header>
 
@@ -305,9 +319,9 @@ export default function DevPart() {
                     <SectionTitle command="whoami" />
                     <GlowingCard className="p-6 ml-6 border-l-2 border-green-500/50">
                         <p className="text-green-300/90 leading-relaxed">
-                            <span className="text-green-500">{`>`}</span> Développeur Full Stack passionné par les technologies web modernes.<br />
-                            <span className="text-green-500">{`>`}</span> Spécialisé en JavaScript, Java.<br />
-                            <span className="text-green-500">{`>`}</span> Toujours en quête d'innovation et de performance.
+                            <span className="text-green-500">{`>`}</span> Ingénieur Génie Logiciel spécialisé dans la conception d'architectures web Full-Stack.<br />
+                            <span className="text-green-500">{`>`}</span> Stack principale : JavaScript / React, Node.js, Java / Spring Boot, PostgreSQL.<br />
+                            <span className="text-green-500">{`>`}</span> Conception d'API RESTful, modélisation de données et intégration d'interfaces haute performance.
                         </p>
                     </GlowingCard>
                 </section>
@@ -421,10 +435,26 @@ export default function DevPart() {
                                 <h3 className="text-xl text-green-400 mb-4 flex items-center gap-2">
                                     <span className="text-green-600">{`>`}</span> Coordonnées
                                 </h3>
-                                <div className="space-y-4 text-green-400/80">
-                                    <p>📧 {contactInfo.email}</p>
-                                    <p>📍 {contactInfo.location}</p>
-                                    <p>📞 {contactInfo.phone}</p>
+                                <div className="space-y-3 text-sm text-green-400/80 font-mono">
+                                    <p>
+                                        <span className="text-green-600">EMAIL //</span>{' '}
+                                        <a href={`mailto:${contactInfo.email}`} className="hover:text-green-300 underline decoration-green-500/40">
+                                            {contactInfo.email}
+                                        </a>
+                                    </p>
+                                    <p><span className="text-green-600">LOC   //</span> {contactInfo.location}</p>
+                                    <p>
+                                        <span className="text-green-600">TEL   //</span>{' '}
+                                        <a
+                                            href={formatWhatsAppUrl(contactInfo.phone)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            title="Discuter sur WhatsApp"
+                                            className="hover:text-green-300 underline decoration-green-500/40"
+                                        >
+                                            {contactInfo.phone} (WhatsApp ↗)
+                                        </a>
+                                    </p>
                                 </div>
                             </GlowingCard>
 

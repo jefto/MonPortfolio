@@ -1,27 +1,47 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import SEO from "../../components/SEO";
-
-// Réseaux sociaux
-const socialLinks = [
-    { name: "GitHub", url: "https://github.com/jefto", icon: FaGithub },
-    { name: "LinkedIn", url: "https://www.linkedin.com/in/jefto2/", icon: FaLinkedin },
-    { name: "Instagram", url: "https://www.instagram.com/jefto2.0/", icon: FaInstagram },
-    { name: "WhatsApp", url: "https://wa.me/22891020171", icon: FaWhatsapp },
-    { name: "Twitter/X", url: "https://x.com/putamadre2_0", icon: FaXTwitter }
-];
+import {
+    getStatistics,
+    formatWhatsAppUrl,
+    DEFAULT_CONTACT_INFO,
+} from "../../services/api";
 
 export default function Contact() {
     const formRef = useRef();
+    const [contactInfo, setContactInfo] = useState(DEFAULT_CONTACT_INFO);
+
+    useEffect(() => {
+        getStatistics()
+            .then((stats) => {
+                if (stats) {
+                    setContactInfo({
+                        contactPhone: stats.contactPhone || DEFAULT_CONTACT_INFO.contactPhone,
+                        contactEmail: stats.contactEmail || DEFAULT_CONTACT_INFO.contactEmail,
+                        contactLocation: stats.contactLocation || DEFAULT_CONTACT_INFO.contactLocation,
+                    });
+                }
+            })
+            .catch(() => {});
+    }, []);
+
+    const socialLinks = [
+        { name: "GitHub", url: "https://github.com/jefto", icon: FaGithub },
+        { name: "LinkedIn", url: "https://www.linkedin.com/in/jefto2/", icon: FaLinkedin },
+        { name: "Instagram", url: "https://www.instagram.com/jefto2.0/", icon: FaInstagram },
+        { name: "WhatsApp", url: formatWhatsAppUrl(contactInfo.contactPhone), icon: FaWhatsapp },
+        { name: "Twitter / X", url: "https://x.com/putamadre2_0", icon: FaXTwitter }
+    ];
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         title: '',
         message: ''
     });
-    const [buttonState, setButtonState] = useState('idle'); // 'idle' | 'sending' | 'sent' | 'error'
+    const [buttonState, setButtonState] = useState('idle');
 
     const handleChange = (e) => {
         setFormData({
@@ -42,14 +62,12 @@ export default function Contact() {
                 'JoxxtCta16gAIhrX7'
             )
             .then(
-                (result) => {
-                    console.log('Email envoyé avec succès :', result.text);
+                () => {
                     setButtonState('sent');
                     setFormData({ name: '', email: '', title: '', message: '' });
                     setTimeout(() => setButtonState('idle'), 3000);
                 },
-                (error) => {
-                    console.error('Erreur lors de l\'envoi de l\'email :', error.text);
+                () => {
                     setButtonState('error');
                     setTimeout(() => setButtonState('idle'), 3000);
                 }
@@ -57,68 +75,101 @@ export default function Contact() {
     };
 
     const buttonConfig = {
-        idle: { text: 'Envoyer le message', className: 'bg-blue-500 hover:bg-blue-600', disabled: false },
-        sending: { text: 'Envoi en cours...', className: 'bg-blue-400 cursor-wait', disabled: true },
-        sent: { text: '✓ Message envoyé !', className: 'bg-green-500', disabled: true },
-        error: { text: '✗ Échec de l\'envoi', className: 'bg-red-500', disabled: true },
+        idle: { text: 'Envoyer le message', className: 'bg-blue-600 hover:bg-blue-500', disabled: false },
+        sending: { text: 'Transmission en cours...', className: 'bg-zinc-700 cursor-wait', disabled: true },
+        sent: { text: 'Message transmis', className: 'bg-emerald-600', disabled: true },
+        error: { text: 'Échec de transmission — Réessayer', className: 'bg-red-600', disabled: true },
     };
 
     return (
-        <footer className="bg-gray-900 text-white py-4 px-8 md:px-16">
+        <footer className="relative bg-zinc-950 text-zinc-100 py-16 px-4 sm:px-8 md:px-16 overflow-hidden">
             <SEO
                 title="Contact — TCHAMIE Jephte"
-                description="Contactez TCHAMIE Jephte, développeur web et UI/UX designer à Lomé, Togo. Email : jefftchamie@gmail.com | Tél : +228 91020171."
+                description="Contactez TCHAMIE Jephte, ingénieur logiciel et UI/UX designer à Lomé, Togo. Email : jefftchamie@gmail.com | Tél : +228 91020171."
                 path="/contact"
             />
-            <div className="max-w-7xl mx-auto">
-                {/* Titre */}
-                <h2 className="text-4xl font-bold text-center mb-12 font-abril">
-                    Contactez<span className="text-blue-500">-moi</span>
-                </h2>
+            {/* Figures géométriques en arrière-plan */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                <svg
+                    className="absolute -right-20 -bottom-20 w-[480px] h-[480px] text-white/15"
+                    viewBox="0 0 400 400"
+                    fill="none"
+                >
+                    <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="1.5" strokeDasharray="8 8" />
+                    <circle cx="200" cy="200" r="120" stroke="#3b82f6" strokeOpacity="0.45" strokeWidth="1.5" />
+                    <polygon points="200,30 370,200 200,370 30,200" stroke="currentColor" strokeWidth="1.4" />
+                </svg>
+                <svg
+                    className="absolute -left-16 top-10 w-[300px] h-[300px] text-amber-400/15"
+                    viewBox="0 0 300 300"
+                    fill="none"
+                >
+                    <circle cx="150" cy="150" r="120" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 5" />
+                    <rect x="75" y="75" width="150" height="150" stroke="currentColor" strokeWidth="1.4" transform="rotate(20 150 150)" />
+                </svg>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-                    {/* Formulaire de contact */}
-                    <div className="font-poppins">
-                        <h3 className="text-2xl font-semibold mb-6 text-blue-400">Envoyez un message</h3>
+            <div className="max-w-7xl mx-auto relative z-10">
+                <div className="mb-12 pb-6 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div>
+                        <span className="font-mono text-xs uppercase tracking-[0.2em] text-blue-400 block mb-2">
+                            05 // CONTACT DIRECT &amp; COLLABORATIONS
+                        </span>
+                        <h2 className="text-3xl sm:text-4xl font-bold font-abril text-white">
+                            Démarrer un projet
+                        </h2>
+                    </div>
+                    <div className="flex items-center gap-3 font-mono text-xs">
+                        <Link to="/dev" className="text-emerald-400 hover:underline">
+                            /dev (Engineering)
+                        </Link>
+                        <span className="text-zinc-700">·</span>
+                        <Link to="/design" className="text-amber-400 hover:underline">
+                            /design (Studio UI/UX)
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-12">
+                    {/* Formulaire */}
+                    <div className="lg:col-span-7 font-poppins">
                         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-                            {/* Nom */}
-                            <div>
-                                <label htmlFor="name" className="block text-sm font-medium mb-2">
-                                    Nom complet <span className="text-red-400">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                    placeholder="John Doe"
-                                />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="name" className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
+                                        Nom complet *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 text-sm"
+                                        placeholder="Nom et prénom"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="email" className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
+                                        Adresse email *
+                                    </label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 text-sm"
+                                        placeholder="nom@organisation.com"
+                                    />
+                                </div>
                             </div>
 
-                            {/* Email */}
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium mb-2">
-                                    Email <span className="text-red-400">*</span>
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                    placeholder="john@example.com"
-                                />
-                            </div>
-
-                            {/* Sujet */}
-                            <div>
-                                <label htmlFor="title" className="block text-sm font-medium mb-2">
-                                    Sujet
+                                <label htmlFor="title" className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
+                                    Objet de la demande
                                 </label>
                                 <input
                                     type="text"
@@ -126,15 +177,14 @@ export default function Contact() {
                                     name="title"
                                     value={formData.title}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                    placeholder="Projet de collaboration..."
+                                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 text-sm"
+                                    placeholder="Développement Full-Stack, Conception UI/UX, Opportunité..."
                                 />
                             </div>
 
-                            {/* Message */}
                             <div>
-                                <label htmlFor="message" className="block text-sm font-medium mb-2">
-                                    Message <span className="text-red-400">*</span>
+                                <label htmlFor="message" className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
+                                    Message *
                                 </label>
                                 <textarea
                                     id="message"
@@ -143,76 +193,81 @@ export default function Contact() {
                                     onChange={handleChange}
                                     required
                                     rows="5"
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
-                                    placeholder="Décrivez votre projet ou votre demande..."
+                                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 text-sm resize-none"
+                                    placeholder="Précisez le périmètre technique, les délais ou les besoins design..."
                                 />
                             </div>
 
-                            {/* Bouton Submit */}
                             <button
                                 type="submit"
                                 disabled={buttonConfig[buttonState].disabled}
-                                className={`w-full px-6 py-3 ${buttonConfig[buttonState].className} text-white font-semibold rounded-lg transition-all duration-300 shadow-lg shadow-blue-500/30`}
+                                className={`w-full px-6 py-3.5 ${buttonConfig[buttonState].className} text-white font-mono text-xs uppercase tracking-widest rounded-lg transition-colors`}
                             >
                                 {buttonConfig[buttonState].text}
                             </button>
                         </form>
                     </div>
 
-                    {/* Réseaux sociaux et infos */}
-                    <div className="font-poppins">
-                        <h3 className="text-2xl font-semibold mb-6 text-blue-400">Suivez-moi</h3>
-
-                        {/* Réseaux sociaux */}
-                        <div className="grid grid-cols-2 gap-4 mb-8">
-                            {socialLinks.map((social, index) => (
-                                <a
-                                    key={index}
-                                    href={social.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-3 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg hover:border-blue-500 hover:bg-gray-700 transition-all duration-300 group"
-                                >
-                                    <social.icon className="text-2xl text-blue-400 group-hover:text-blue-300 transition-colors" />
-                                    <span className="text-sm">{social.name}</span>
-                                </a>
-                            ))}
+                    {/* Coordonnées & Réseaux */}
+                    <div className="lg:col-span-5 font-poppins space-y-6">
+                        <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
+                            <h3 className="font-mono text-xs uppercase tracking-widest text-zinc-400 mb-4">
+                                COORDONNÉES DIRECTES
+                            </h3>
+                            <div className="space-y-3 text-sm font-mono">
+                                <div className="flex items-center justify-between py-2 border-b border-zinc-800">
+                                    <span className="text-zinc-500">EMAIL</span>
+                                    <a href={`mailto:${contactInfo.contactEmail}`} className="text-zinc-200 hover:text-blue-400">
+                                        {contactInfo.contactEmail}
+                                    </a>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-zinc-800">
+                                    <span className="text-zinc-500">TÉLÉPHONE (WHATSAPP)</span>
+                                    <a
+                                        href={formatWhatsAppUrl(contactInfo.contactPhone)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title="Ouvrir la discussion sur WhatsApp"
+                                        className="inline-flex items-center gap-1.5 text-zinc-200 hover:text-emerald-400 transition-colors"
+                                    >
+                                        <FaWhatsapp className="text-emerald-400 text-sm" />
+                                        <span>{contactInfo.contactPhone}</span>
+                                    </a>
+                                </div>
+                                <div className="flex items-center justify-between py-2">
+                                    <span className="text-zinc-500">LOCALISATION</span>
+                                    <span className="text-zinc-200">{contactInfo.contactLocation}</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Informations de contact */}
-                        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                            <h4 className="text-lg font-semibold mb-4 text-blue-400">Coordonnées</h4>
-                            <div className="space-y-3 text-sm">
-                                <div className="flex items-center gap-3">
-                                    <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                    <span className="text-gray-300">jefftchamie@gmail.com</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
-                                    <span className="text-gray-300">+228 91020171</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span className="text-gray-300">Lomé, Togo</span>
-                                </div>
+                        <div>
+                            <h3 className="font-mono text-xs uppercase tracking-widest text-zinc-400 mb-3">
+                                PROFILS &amp; RÉSEAUX
+                            </h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {socialLinks.map((social, index) => (
+                                    <a
+                                        key={index}
+                                        href={social.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-zinc-600 transition-colors group"
+                                    >
+                                        <social.icon className="text-lg text-zinc-400 group-hover:text-white transition-colors" />
+                                        <span className="text-xs font-mono text-zinc-300 group-hover:text-white">
+                                            {social.name}
+                                        </span>
+                                    </a>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Séparateur */}
-                <div className="border-t border-gray-800 my-8"></div>
-
-                {/* Copyright */}
-                <div className="text-center text-gray-400 text-sm font-poppins">
-                    <p>© {new Date().getFullYear()} - Made by <span className="text-blue-400 font-semibold">Jefto2.0</span> </p>
+                <div className="border-t border-zinc-900 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500 text-xs font-mono">
+                    <p>© {new Date().getFullYear()} TCHAMIE JEPHTE — INGÉNIERIE LOGICIELLE &amp; DESIGN</p>
+                    <p>LOMÉ, TOGO</p>
                 </div>
             </div>
         </footer>

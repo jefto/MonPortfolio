@@ -1,5 +1,17 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
+Allow: /dev
+Allow: /design
+Allow: /contact
+Allow: /about
+Allow: /skill
+Allow: /static/
 
+# Empêcher l'indexation du panneau d'administration privé
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/*
+
+# Emplacement du plan de site XML
 Sitemap: https://tchamie-jephte-portfolio.vercel.app/sitemap.xml
